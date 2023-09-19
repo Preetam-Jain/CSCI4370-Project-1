@@ -6,6 +6,10 @@ import uga.cs4370.mydb.Type;
 
 public class Relation implements uga.cs4370.mydb.Relation {
 
+    private String name;
+    private int size;
+    private List<List<Cell>>;
+
     public String getName() {
         throw new UnsupportedOperationException("Method not implemented yet");
     }
@@ -52,6 +56,7 @@ public class Relation implements uga.cs4370.mydb.Relation {
 
     @Override
     public void print() {
+        
         throw new UnsupportedOperationException("Method not implemented yet");
     }
     
