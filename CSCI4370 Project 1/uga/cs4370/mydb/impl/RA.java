@@ -34,7 +34,31 @@ public class RA implements uga.cs4370.mydb.RA{
      * @throws IllegalArgumentException If attributes in attrs are not 
      * present in rel.
      */
-    public Relation project(Relation rel, List<String> attrs);
+    public Relation project(Relation rel, List<String> attrs) {
+        //getting types
+        List <Type> t = new ArrayList<>();
+        for (String attr : attrs) {
+            try {
+                int index = rel.getAttrIndex(attr);
+                t.add(rel.getTypes().get(index));
+            }
+            catch(IllegalArgumentException i) {
+                throw new IllegalArgumentException("Attribute does not exist");
+            }
+        }
+        //making new relation
+        Relation newRel = new Relation(rel.getName(), attrs, t);
+
+        //adding the columns/attribute values to the newRel
+        for (String attr : attrs) {
+            int index = rel.getAttrIndex(attr);
+            List <Cell> column = rel.getRows().get(index);
+            for (Cell cell: column) {
+                newRel.insert(cell);
+            }
+        }
+        return newRel;
+    }
 
     /**
      * Performs the union operation on the relations rel1 and rel2.
@@ -43,7 +67,49 @@ public class RA implements uga.cs4370.mydb.RA{
      * 
      * @throws IllegalArgumentException If rel1 and rel2 are not compatible.
      */
-    public Relation union(Relation rel1, Relation rel2);
+    public Relation union(Relation rel1, Relation rel2){
+        //To get common attributes and create new union relation
+        List <String> attrs1 = rel1.getAttrs();
+        List <String> attrs2 = rel2.getAttrs();
+        List <String> unionAttr = new ArrayList<>();
+
+        List <Type> types = new ArrayList<>();
+        List <Type> a1Types = rel1.getTypes();
+        List <Type> a2Types = rel2.getTypes();
+        
+        for (int i = 0; i < (attrs1.size() + attrs2.size()); i++) {
+            if (i < attrs1.size()) {
+                unionAttr.add(attrs1.get(i));
+                types.add(a1Types.get(rel1.getAttrIndex(attrs1.get(i))));
+            }
+            if (i >= attrs1.size() && !unionAttr.contains(attrs2.get(i%attrs1.size()))) {
+                unionAttr.add(attrs2.get(i%attrs1.size()));
+                types.add(a2Types.get(rel2.getAttrIndex(attrs2.get(i%attrs2.size()))));
+            }
+        }
+        Relation newRel = new Relation("union of" + rel1.getName() + " and "+ rel2.getName(), unionAttr, types);
+        
+        //Building the new union relation
+        for (int i = 0; i < (attrs1.size() + attrs2.size()); i++) { //building new cells array for every row
+            List <Cell> cells = new ArrayList<>();
+            for (String attrs : unionAttr) {
+                if (rel1.hasAttr(attrs) && i < rel1.getSize()) {
+                    cells.add(rel1.getRows().get(i).get(rel1.getAttrIndex(attrs)));
+                }
+                else if (!rel1.hasAttr(attrs) && i < rel1.getSize()) {
+                    cells.add(null);
+                }
+                if (rel2.hasAttr(attrs) && i < rel2.getSize() && i >= rel1.getSize()) {
+                    cells.add(rel2.getRows().get(i).get(rel2.getAttrIndex(attrs)));
+                }
+                if (!rel2.hasAttr(attrs) && i < rel2.getSize() && i >= rel1.getSize()) {
+                    cells.add(null);
+                }
+            }
+            newRel.insert(cells);
+        }
+        return newRel;
+    }
 
     /**
      * Performs the set difference operation on the relations rel1 and rel2.
@@ -52,7 +118,54 @@ public class RA implements uga.cs4370.mydb.RA{
      * 
      * @throws IllegalArgumentException If rel1 and rel2 are not compatible.
      */
-    public Relation diff(Relation rel1, Relation rel2);
+    public Relation diff(Relation rel1, Relation rel2) {
+        //Assume that primary keys, or IDs, are the first value
+        List <List<Cell>> table1 = rel1.getRows();
+        List <List<Cell>> table2 = rel2.getRows();
+
+        List <String> attrs1 = rel1.getAttrs();
+        List <String> attrs2 = rel2.getAttrs();
+        List <String> unionAttr = new ArrayList<>();
+
+        List <Type> types = new ArrayList<>();
+        List <Type> a1Types = rel1.getTypes();
+        List <Type> a2Types = rel2.getTypes();
+        
+        for (int i = 0; i < (attrs1.size() + attrs2.size()); i++) {
+            if (i < attrs1.size()) {
+                unionAttr.add(attrs1.get(i));
+                types.add(a1Types.get(rel1.getAttrIndex(attrs1.get(i))));
+            }
+            if (i >= attrs1.size() && !unionAttr.contains(attrs2.get(i%attrs1.size()))) {
+                unionAttr.add(attrs2.get(i%attrs1.size()));
+                types.add(a2Types.get(rel2.getAttrIndex(attrs2.get(i%attrs2.size()))));
+            }
+        }
+        Relation newRel = new Relation("Difference of " + rel1 + " and " + rel2, unionAttr, types);
+
+        for (int i = 0; i < rel1.getSize(); i++) {
+            for (int j = 0; j < rel2.getSize(); j++) {
+                List <Cell> row = table1.get(i);
+                String id = row.get(0).toString();
+                if (!table2.get(j).get(0).toString().equals(id)) {
+                    newRel.insert(row);
+                }
+            }
+        }
+        for (int i = 0; i < rel2.getSize(); i++) {
+            for (int j = 0; j < rel1.getSize(); j++) {
+                List <Cell> row = table2.get(i);
+                String id = row.get(0).toString();
+                if (!table1.get(j).get(0).toString().equals(id)) {
+                    newRel.insert(row);
+                }
+            }
+        }
+        if (newRel.getSize()==0) {
+            throw new IllegalArgumentException("Relations are incompatible");
+        }
+        return newRel;
+    }
 
     /**
      * Renames the attributes in origAttr of relation rel to corresponding 
@@ -63,7 +176,20 @@ public class RA implements uga.cs4370.mydb.RA{
      * @throws IllegalArgumentException If attributes in origAttr are not present in 
      * rel or origAttr and renamedAttr do not have matching argument counts.
      */
-    public Relation rename(Relation rel, List<String> origAttr, List<String> renamedAttr);
+    public Relation rename(Relation rel, List<String> origAttr, List<String> renamedAttr) {
+        if (origAttr.size() != renamedAttr.size()) {
+            throw new IllegalArgumentException("Uneven attribute counts");
+        }
+        if (!rel.getAttrs().equals(origAttr)) {
+            throw new IllegalArgumentException("Attributes dont match or not present in the relation");
+        }
+        Relation renamed = new Relation(rel.getName(), renamedAttr, rel.getTypes());
+        List <List<Cell>> table = rel.getRows();
+        for (List <Cell> row : table) {
+            renamed.insert(row);
+        }
+        return renamed;
+    }
 
     /**
      * Performs cartisian product on relations rel1 and rel2.
@@ -72,19 +198,106 @@ public class RA implements uga.cs4370.mydb.RA{
      * 
      * @throws IllegalArgumentException if rel1 and rel2 have common attibutes.
      */
-    public Relation cartesianProduct(Relation rel1, Relation rel2);
+    public Relation cartesianProduct(Relation rel1, Relation rel2) {
+        //Creating the new relation
+        List <String> attrs1 = rel1.getAttrs();
+        List <String> attrs2 = rel2.getAttrs();
+        for (String attr : attrs2) {
+            if (attrs1.contains(attr)) {
+                throw new IllegalArgumentException("Common attributes present");
+            }
+        }
+        attrs1.addAll(attrs2);
+
+        List <Type> types = rel1.getTypes();
+        types.addAll(rel2.getTypes());
+
+        Relation newRel = new Relation("Cartesion Product of " + rel1.getName() + " and " + rel2.getName(), attrs1, types);;
+        
+        //Cartesian product with double for each loop
+        List <List<Cell>> table1 = rel1.getRows();
+        List <List<Cell>> table2 = rel2.getRows();
+        for (List<Cell> row1 : table1) {
+            for (List<Cell> row2 : table2) {
+                List <Cell> combined = new ArrayList<>();
+                combined.addAll(row1);
+                combined.addAll(row2);
+                newRel.insert(combined);
+            }
+        }
+        return newRel;
+    }
 
     /**
      * Peforms natural join on relations rel1 and rel2.
      * 
      * @return The resulting relation after applying natural join.
      */
-    public Relation join(Relation rel1, Relation rel2);
+    public Relation join(Relation rel1, Relation rel2) {
+        //Tables
+        List <List<Cell>> table1 = rel1.getRows();
+        List <List<Cell>> table2 = rel2.getRows();
+
+        //Atrributes
+        List <String> attrs1 = rel1.getAttrs();
+        List <String> attrs2 = rel2.getAttrs();
+
+        //Common attribute indexes in rel1 and types
+        List <String> attrs = new ArrayList<>();
+        List <Type> types = new ArrayList<>();
+        for (int i = 0; i < attrs1.size() + attrs2.size(); i++) {
+            if (i < attrs1.size()) {
+                attrs.add(attrs1.get(i));
+                types.add(rel1.getTypes().get(i));
+            }
+            else if (i >= attrs1.size() && !attrs.contains(attrs2.get(i%attrs.size()))) {
+                attrs.add(attrs2.get(i%attrs.size()));
+                types.add(rel1.getTypes().get(i%attrs.size()));
+            }
+         }
+        List <String> indices = new ArrayList<>();
+        for (String attr : attrs2) {
+            if (rel1.hasAttr(attr)) {
+                indices.add(attrs2.get(rel1.getAttrIndex(attr)));
+            }
+        }
+        // New Relation
+        Relation newRel = new Relation("Natural join of " + rel1.getName() + " and " + rel2.getName(),attrs, types );
+        
+        //Compare common attribute values and combine
+        boolean same = false;
+        for (List <Cell> row1 : table1) {
+            for (List <Cell> row2 : table2) {
+                for (String attribute : indices) {
+                    if (row1.get(rel1.getAttrIndex(attribute)).toString().equals(row2.get(rel2.getAttrIndex(attribute)).toString())) {
+                        same = true;
+                    }
+                    same = false;
+                }
+                if (same) {
+                    //Found the row2 that matches with row1 with common attributes
+                    List <Cell> commonRow = new ArrayList<>();
+                    for (int i = 0; i < row1.size() + row2.size(); i++) {
+                        if (i < row1.size()) {
+                            commonRow.add(row1.get(i));
+                        }
+                        else if (i >= row1.size() && !commonRow.contains(row2.get(i%row1.size()))) {
+                            commonRow.add(row2.get(i%row1.size()));
+                        }
+                    }
+                }
+            }
+        }
+        return newRel;
+    }
 
     /**
      * Performs theta join on relations rel1 and rel2 with predicate p.
      * 
      * @return The resulting relation after applying theta join.
      */
-    public Relation join(Relation rel1, Relation rel2, Predicate p);
+    public Relation join(Relation rel1, Relation rel2, Predicate p) {
+        Relation rel = join(rel1, rel2);
+        return select(rel, p);
+    }
 }
