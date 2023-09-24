@@ -18,6 +18,7 @@ public class Predicate implements uga.cs4370.mydb.Predicate {
         if (condition.contains("\"")) { //Ex. attr = "specific value"
             attribute = condition.split("=")[0];
             attrValue = condition.split("=")[1];
+            attrValue = condition.substring(1, attrValue.length()-1);//get rid of quotations
         }
         else {
             attribute = condition.split("=")[0];
@@ -76,3 +77,4 @@ public class Predicate implements uga.cs4370.mydb.Predicate {
     
     
 }
+
