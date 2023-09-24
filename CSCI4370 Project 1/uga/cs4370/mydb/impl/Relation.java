@@ -102,7 +102,16 @@ public class Relation implements uga.cs4370.mydb.Relation {
 
     @Override
     public void print() {
-        throw new UnsupportedOperationException("Method not implemented yet");
+        for (int i = 0; i < table.size(); i++) {
+            System.out.print(" | ");
+            for (int j = 0; j < table.get(0).size(); j++) {
+                System.out.print(attrs.get(j));
+                System.out.print(table.get(i).get(j).toString());
+                System.out.print(" | ");
+            }
+            System.out.println();
+
+        }
     }
     
 }
