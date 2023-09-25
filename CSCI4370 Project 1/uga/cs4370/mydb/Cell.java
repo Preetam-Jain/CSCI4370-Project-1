@@ -33,13 +33,6 @@ public class Cell {
     }
 
     /**
-     * Returns the type of the cell
-     */
-    public Type getType() {
-        return this.type;
-    }
-    
-    /**
      * Returns the cell value as an integer.
      */
     public int getAsInt() {
