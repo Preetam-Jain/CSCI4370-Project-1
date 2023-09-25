@@ -3,7 +3,6 @@ package uga.cs4370.mydb.impl;
 import java.util.ArrayList;
 import java.util.List;
 import uga.cs4370.mydb.*;
-import uga.cs4370.mydb.Relation;
 
 public class RAImpl implements uga.cs4370.mydb.RA {
 
@@ -293,7 +292,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
     }
     
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'join'");
+        Relation rel = cartesianProduct(rel1, rel2);
+        return select(rel, p);
     }
 }

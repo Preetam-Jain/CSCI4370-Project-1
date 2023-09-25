@@ -12,8 +12,10 @@ import uga.cs4370.mydb.RA;
 
 public class Main {
     public static void main(String[] args) {
-        Database mydb = new Database("Preetam's Database");
+        Database mydb = new Database("Rigged Data Group Database");
 
+        /* ASSIGNMENT ONE SCHEMA CREATION PLUS ADDING VALUES */
+        
         /* Creating Students Table */
         ArrayList<String> attributesOne = new ArrayList<String>();
         ArrayList<Type> typesOne = new ArrayList<Type>();
@@ -25,26 +27,29 @@ public class Main {
         typesOne.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING, Type.STRING));
         primaryKeysOne.add("StudentID");
  
-        /* Adding Students */
+        /* Adding Students to database*/
         mydb.addRelation(studentsName, attributesOne, typesOne, primaryKeysOne, foreignKeysOne);
 
-        List<Cell> rowOne = new ArrayList<Cell>();
-        rowOne.add(new Cell(1234));
-        rowOne.add(new Cell("Deven"));
-        rowOne.add(new Cell("Allen"));
-        rowOne.add(new Cell("2002-03-05"));
-        rowOne.add(new Cell("Computer Science"));
+        /* adding students */
+        List<Cell> studentOne = new ArrayList<Cell>();
+        studentOne.add(new Cell(1234));
+        studentOne.add(new Cell("Deven"));
+        studentOne.add(new Cell("Allen"));
+        studentOne.add(new Cell("2002-03-05"));
+        studentOne.add(new Cell("Computer Science"));
 
-        mydb.getRelations().get(0).insert(rowOne);
+        mydb.getRelations().get(0).insert(studentOne);
 
-        List<Cell> rowTwo = new ArrayList<Cell>();
-        rowTwo.add(new Cell(1111));
-        rowTwo.add(new Cell("John"));
-        rowTwo.add(new Cell("Doe"));
-        rowTwo.add(new Cell("1999-05-22"));
-        rowTwo.add(new Cell("Computer Science"));
+
+        List<Cell> StudentTwo = new ArrayList<Cell>();
+        StudentTwo.add(new Cell(1111));
+        StudentTwo.add(new Cell("John"));
+        StudentTwo.add(new Cell("Doe"));
+        StudentTwo.add(new Cell("1999-05-22"));
+        StudentTwo.add(new Cell("Computer Science"));
  
-        mydb.getRelations().get(0).insert(rowTwo);
+        mydb.getRelations().get(0).insert(StudentTwo);
+
 
         /* Creating Courses Table */
         ArrayList<String> attributesTwo = new ArrayList<String>();
@@ -57,49 +62,208 @@ public class Main {
         typesTwo.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
         primaryKeysTwo.add("CourseID");
 
+        /* adding courses to database*/
         mydb.addRelation(coursesName, attributesTwo, typesTwo, primaryKeysTwo, foreignKeysTwo);
+        
+        /* Adding Courses */
+        List<Cell> CourseOne = new ArrayList<Cell>();
+        CourseOne.add(new Cell(101));
+        CourseOne.add(new Cell("Introduction to Programming"));
+        CourseOne.add(new Cell(3));
+
+        mydb.getRelationByName("Courses").insert(CourseOne);
 
 
+        List<Cell> CourseTwo = new ArrayList<Cell>();
+        CourseTwo.add(new Cell(102));
+        CourseTwo.add(new Cell("Database Management"));
+        CourseTwo.add(new Cell(4));
+ 
+        mydb.getRelationByName("Courses").insert(CourseTwo);
+
+
+        List<Cell> CourseThree = new ArrayList<Cell>();
+        CourseThree.add(new Cell(103));
+        CourseThree.add(new Cell("Software Engineering"));
+        CourseThree.add(new Cell(3));
+
+        mydb.getRelationByName("Courses").insert(CourseThree);
+
+
+        List<Cell> CourseFour = new ArrayList<Cell>();
+        CourseFour.add(new Cell(104));
+        CourseFour.add(new Cell("Data Structures"));
+        CourseFour.add(new Cell(4));
+ 
+        mydb.getRelationByName("Courses").insert(CourseFour);
+
+
+        /* Creating Enrollment Table */
         ArrayList<String> attributesThree = new ArrayList<String>();
         ArrayList<Type> typesThree = new ArrayList<Type>();
         ArrayList<String> primaryKeysThree = new ArrayList<String>();
         ArrayList<String> foreignKeysThree = new ArrayList<String>();
 
+        String enrollmentName = "Enrollment";
+        attributesThree.addAll(Arrays.asList("EnrollmentID", "StudentID", "CourseID", "Grade"));
+        typesThree.addAll(Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER, Type.STRING));
+        primaryKeysThree.add("EnrollmentID");
+
+        /* adding enrollment to database*/
+        mydb.addRelation(enrollmentName, attributesThree, typesThree, primaryKeysThree, foreignKeysThree);
+
+        /* adding enrollment values */
+        List<Cell> EnrollmentOne = new ArrayList<Cell>();
+        EnrollmentOne.add(new Cell(1));
+        EnrollmentOne.add(new Cell(1234));
+        EnrollmentOne.add(new Cell(101));
+        EnrollmentOne.add(new Cell("A"));
+
+        mydb.getRelationByName("Enrollment").insert(EnrollmentOne);
+
+
+        List<Cell> EnrollmentTwo = new ArrayList<Cell>();
+        EnrollmentTwo.add(new Cell(2));
+        EnrollmentTwo.add(new Cell(1234));
+        EnrollmentTwo.add(new Cell(102));
+        EnrollmentTwo.add(new Cell("B"));
+ 
+        mydb.getRelationByName("Enrollment").insert(EnrollmentTwo);
+
+
+        List<Cell> EnrollmentThree = new ArrayList<Cell>();
+        EnrollmentThree.add(new Cell(3));
+        EnrollmentThree.add(new Cell(1111));
+        EnrollmentThree.add(new Cell(101));
+        EnrollmentThree.add(new Cell("B"));
+
+        mydb.getRelationByName("Enrollment").insert(EnrollmentThree);
+
+
+        List<Cell> EnrollmentFour = new ArrayList<Cell>();
+        EnrollmentFour.add(new Cell(4));
+        EnrollmentFour.add(new Cell(1111));
+        EnrollmentFour.add(new Cell(102));
+        EnrollmentFour.add(new Cell("C"));
+ 
+        mydb.getRelationByName("Enrollment").insert(EnrollmentFour);
+
+
+        List<Cell> EnrollmentFive = new ArrayList<Cell>();
+        EnrollmentFive.add(new Cell(5));
+        EnrollmentFive.add(new Cell(1111));
+        EnrollmentFive.add(new Cell(103));
+        EnrollmentFive.add(new Cell("A"));
+ 
+        mydb.getRelationByName("Enrollment").insert(EnrollmentFive);
+
+
+        List<Cell> EnrollmentSix = new ArrayList<Cell>();
+        EnrollmentSix.add(new Cell(6));
+        EnrollmentSix.add(new Cell(4444));
+        EnrollmentSix.add(new Cell(101));
+        EnrollmentSix.add(new Cell("F"));
+ 
+        // THIS IS THE LINE WHERE THE OOB ERROR HAPPENS
+        //mydb.getRelationByName("Enrollment").insert(EnrollmentSix);
+
+
+        /* Creating Professors Table */
+        ArrayList<String> attributesFour = new ArrayList<String>();
+        ArrayList<Type> typesFour = new ArrayList<Type>();
+        ArrayList<String> primaryKeysFour = new ArrayList<String>();
+        ArrayList<String> foreignKeysFour = new ArrayList<String>();
+
+        String professorsName = "Professors";
+        attributesFour.addAll(Arrays.asList("ProfessorID", "FName", "LName", "Department"));
+        typesFour.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING));
+        primaryKeysFour.add("ProfessorID");
+
+        /* adding professors to database*/
+        mydb.addRelation(professorsName, attributesFour, typesFour, primaryKeysFour, foreignKeysFour);
+
+        /* adding professor values */
+        List<Cell> ProfessorOne = new ArrayList<Cell>();
+        ProfessorOne.add(new Cell(201));
+        ProfessorOne.add(new Cell("Carl"));
+        ProfessorOne.add(new Cell("Smith"));
+        ProfessorOne.add(new Cell("Computer Science"));
+
+        mydb.getRelationByName("Professors").insert(ProfessorOne);
+
+
+        List<Cell> ProfessorTwo = new ArrayList<Cell>();
+        ProfessorTwo.add(new Cell(202));
+        ProfessorTwo.add(new Cell("Steve"));
+        ProfessorTwo.add(new Cell("Allen"));
+        ProfessorTwo.add(new Cell("Electrical Engineering"));
+
+        mydb.getRelationByName("Professors").insert(ProfessorTwo);
+
+
+        List<Cell> ProfessorThree = new ArrayList<Cell>();
+        ProfessorThree.add(new Cell(203));
+        ProfessorThree.add(new Cell("Matthew"));
+        ProfessorThree.add(new Cell("Mack"));
+        ProfessorThree.add(new Cell("Computer Science"));
+
+        mydb.getRelationByName("Professors").insert(ProfessorThree);
+
+
+
+        /* Creating Teaches Table */
+        ArrayList<String> attributesFive = new ArrayList<String>();
+        ArrayList<Type> typesFive = new ArrayList<Type>();
+        ArrayList<String> primaryKeysFive = new ArrayList<String>();
+        ArrayList<String> foreignKeysFive = new ArrayList<String>();
+
+        String teachesName = "Teaches";
+        attributesFive.addAll(Arrays.asList("TeachID", "ProfessorID", "CourseID"));
+        typesFive.addAll(Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER));
+        primaryKeysFive.add("TeachID");
+
+        /* adding teaches to database*/
+        mydb.addRelation(teachesName, attributesFive, typesFive, primaryKeysFive, foreignKeysFive);
+
+        List<Cell> TeachesOne = new ArrayList<Cell>();
+        TeachesOne.add(new Cell(301));
+        TeachesOne.add(new Cell(201));
+        TeachesOne.add(new Cell(101));
+
+        mydb.getRelationByName("Teaches").insert(TeachesOne);
+
+
+        List<Cell> TeachesTwo = new ArrayList<Cell>();
+        TeachesTwo.add(new Cell(302));
+        TeachesTwo.add(new Cell(202));
+        TeachesTwo.add(new Cell(102));
+
+        mydb.getRelationByName("Teaches").insert(TeachesTwo);
+
+
+        List<Cell> TeachesThree = new ArrayList<Cell>();
+        TeachesThree.add(new Cell(303));
+        TeachesThree.add(new Cell(203));
+        TeachesThree.add(new Cell(101));
+
+        mydb.getRelationByName("Teaches").insert(TeachesThree);
+
+        /* THIS CONCLUDES ADDING ALL THE TABLES AND VALUES FROM ASSIGNMENT 1 */
+
+
+        /* adding classes??? */
+        ArrayList<String> attributesExtra = new ArrayList<String>();
+        ArrayList<Type> typesExtra = new ArrayList<Type>();
+        ArrayList<String> primaryKeysExtra = new ArrayList<String>();
+        ArrayList<String> foreignKeysExtra = new ArrayList<String>();
+
         String className = "Classes";
-        attributesThree.addAll(Arrays.asList("CourseID", "CName", "Credits"));
-        typesThree.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
-        primaryKeysThree.add("CourseID");
-        mydb.addRelation(className, attributesThree, typesThree, primaryKeysThree, foreignKeysThree);
+        attributesExtra.addAll(Arrays.asList("CourseID", "CName", "Credits"));
+        typesExtra.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        primaryKeysExtra.add("CourseID");
+        mydb.addRelation(className, attributesExtra, typesExtra, primaryKeysExtra, foreignKeysExtra);
 
-        
-        /* Adding Courses */
-        List<Cell> rowThree = new ArrayList<Cell>();
-        rowThree.add(new Cell(101));
-        rowThree.add(new Cell("Introduction to Programming"));
-        rowThree.add(new Cell(3));
 
-        mydb.getRelations().get(1).insert(rowThree);
-
-        List<Cell> rowFour = new ArrayList<Cell>();
-        rowFour.add(new Cell(102));
-        rowFour.add(new Cell("Database Management"));
-        rowFour.add(new Cell(4));
- 
-        mydb.getRelations().get(1).insert(rowFour);
-
-        List<Cell> rowFive = new ArrayList<Cell>();
-        rowFive.add(new Cell(103));
-        rowFive.add(new Cell("Software Engineering"));
-        rowFive.add(new Cell(3));
-
-        mydb.getRelationByName("Classes").insert(rowFive);
-
-        List<Cell> rowSix = new ArrayList<Cell>();
-        rowSix.add(new Cell(104));
-        rowSix.add(new Cell("Data Structures"));
-        rowSix.add(new Cell(4));
- 
-        mydb.getRelationByName("Classes").insert(rowSix);
 
         Predicate p0 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
         Predicate p1 = new PredicateImpl("StudentID=\"1234\"", mydb.getRelationByName("Students").getAttrs());
@@ -123,6 +287,27 @@ public class Main {
 
         //relationalAlgebra.project(mydb.getRelationByName("Courses"), projectedAttributes1).print();
 
-        relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
+        //relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
+
+        // TOUCH UP THIS
+        //relationalAlgebra.diff(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
+
+        /* Rename works 
+        ArrayList<String> newAttributes = new ArrayList<String>();
+        newAttributes.addAll(Arrays.asList("CourseID", "Course Name", "Total Credits"));
+        mydb.getRelationByName("Courses").print();
+        relationalAlgebra.rename(mydb.getRelationByName("Courses"), attributesTwo, newAttributes).print();
+        */
+
+
+        // SHOULD WORK, BUT DOUBLE CHECK
+        relationalAlgebra.cartesianProduct(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
+
+
+        // WORKING THROUGH THETA JOIN
+        //Predicate p2 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
+        //relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses"), p2).print();
+
+
     }
 }

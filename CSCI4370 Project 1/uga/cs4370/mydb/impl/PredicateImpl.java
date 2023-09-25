@@ -12,6 +12,7 @@ public class PredicateImpl implements uga.cs4370.mydb.Predicate {
     private String attribute2 = "";
     private String attrValue = "";
     private List <String> attributes = new ArrayList<>();
+    
     public PredicateImpl (String condition, List <String> attributes) {
         this.condition = condition;
         this.attributes = attributes;
