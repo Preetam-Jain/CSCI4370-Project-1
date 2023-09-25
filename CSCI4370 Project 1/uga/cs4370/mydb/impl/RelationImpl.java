@@ -100,6 +100,10 @@ public class RelationImpl implements Relation {
         }
     }
 
+    public HashMap<Integer, String> getForeignKeys() {
+        return this.foreignKeys;
+    }
+
     public void addPrimaryKeys(List<String> attr) {
          for (int i = 0; i < attr.size(); i++) {
             if (!attr.isEmpty()) {
@@ -107,6 +111,10 @@ public class RelationImpl implements Relation {
                 primaryKeys.put(attrs.indexOf(attribute), attribute);
             }
         }
+    }
+
+    public HashMap<Integer, String> getPrimaryKeys() {
+        return this.primaryKeys;
     }
 
     @Override
