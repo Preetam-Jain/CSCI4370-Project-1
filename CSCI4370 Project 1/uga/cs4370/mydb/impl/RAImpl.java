@@ -92,9 +92,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         List <Type> unionTypes = new ArrayList<>();
         unionTypes.addAll(a1Types);
 
-        Relation newRel = new RelationImpl("Union of" + rel1.getName() + " and "+ rel2.getName(), unionAttrs, unionTypes);
-        System.out.println(newRel.getTypes());
-        System.out.println(newRel.getAttrs());
+        Relation newRel = new RelationImpl("Union of " + rel1.getName() + " and "+ rel2.getName(), unionAttrs, unionTypes);
         //Building the new union relation
         int counter = 0;
         for (int i = 0; i < (rel1.getSize() + rel2.getSize()); i++) { //building new cells array for every row
@@ -105,7 +103,6 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                 cells.addAll(rel2.getRows().get(counter));
                 counter++;
             }
-            System.out.println("cells: " + cells);
             newRel.insert(cells);
         }
         return newRel;

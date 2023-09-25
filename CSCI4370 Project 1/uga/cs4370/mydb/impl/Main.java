@@ -69,7 +69,7 @@ public class Main {
         attributesThree.addAll(Arrays.asList("CourseID", "CName", "Credits"));
         typesThree.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
         primaryKeysThree.add("CourseID");
-        mydb.addRelation(coursesName, attributesTwo, typesTwo, primaryKeysTwo, foreignKeysTwo);
+        mydb.addRelation(className, attributesThree, typesThree, primaryKeysThree, foreignKeysThree);
 
         
         /* Adding Courses */
@@ -87,8 +87,23 @@ public class Main {
  
         mydb.getRelations().get(1).insert(rowFour);
 
-        mydb.getRelations().get(0).print();
-        mydb.getRelations().get(1).print();
+        List<Cell> rowFive = new ArrayList<Cell>();
+        rowFive.add(new Cell(103));
+        rowFive.add(new Cell("Software Engineering"));
+        rowFive.add(new Cell(3));
+
+        mydb.getRelationByName("Classes").insert(rowFive);
+
+        List<Cell> rowSix = new ArrayList<Cell>();
+        rowSix.add(new Cell(104));
+        rowSix.add(new Cell("Data Structures"));
+        rowSix.add(new Cell(4));
+ 
+        mydb.getRelationByName("Classes").insert(rowSix);
+
+        mydb.getRelationByName("Students").print();
+        mydb.getRelationByName("Courses").print();
+        mydb.getRelationByName("Classes").print();
         Predicate p0 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
         Predicate p1 = new PredicateImpl("StudentID=\"1234\"", mydb.getRelationByName("Students").getAttrs());
         RA relationalAlgebra = new RAImpl();
@@ -103,6 +118,6 @@ public class Main {
         projectedAttributes1.addAll(Arrays.asList("CourseID", "CName"));
         //relationalAlgebra.project(mydb.getRelationByName("Courses"), projectedAttributes1).print();
 
-        relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Students")).print();
+        relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
     }
 }
