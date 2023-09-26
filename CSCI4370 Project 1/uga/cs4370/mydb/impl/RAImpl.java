@@ -6,7 +6,7 @@ import uga.cs4370.mydb.*;
 import uga.cs4370.mydb.Relation;
 
 public class RAImpl implements uga.cs4370.mydb.RA {
-
+    // add support for foreign and primary keys to be saved when you select and project
     RelationBuilderImpl builder;
     
     public RAImpl() {
@@ -19,12 +19,19 @@ public class RAImpl implements uga.cs4370.mydb.RA {
      * @return The resulting relation after applying the select operation.
      */
     public Relation select(Relation rel, Predicate p) {
-        List <List<Cell>> copy = new ArrayList<>();
-        copy = rel.getRows();
+
+        List <List<Cell>> copy = rel.getRows();
         Relation result = builder.newRelation(rel.getName(), rel.getAttrs(), rel.getTypes());
+        List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel).getForeignKeys().values());
+        ((RelationImpl)result).addForeignKeys(foreignKeys);
+        List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel).getPrimaryKeys().values());
+        ((RelationImpl)result).addPrimaryKeys(primaryKeys);
+
         for (List <Cell> row : copy) {
             if (p.check(row)) {
-                result.insert(row);
+                List<Cell> inserted = new ArrayList<Cell>();
+                inserted.addAll(row);
+                result.insert(inserted);
             }
         }
         return result;
@@ -40,19 +47,34 @@ public class RAImpl implements uga.cs4370.mydb.RA {
      * present in rel.
      */
     public Relation project(Relation rel, List<String> attrs) {
-        //getting types
-        List <Type> t = new ArrayList<>();
+        List <Type> types = new ArrayList<>();
+        List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel).getForeignKeys().values());
+        List<String> newForeignKeys = new ArrayList<String>();
+        List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel).getPrimaryKeys().values());
+        List<String> newPrimaryKeys = new ArrayList<String>();
         for (String attr : attrs) {
             try {
                 int index = rel.getAttrIndex(attr);
-                t.add(rel.getTypes().get(index));
+                types.add(rel.getTypes().get(index));
             }
             catch(IllegalArgumentException i) {
                 throw new IllegalArgumentException("Attribute does not exist");
             }
         }
+        for (String foreignKey : foreignKeys) {
+            if (attrs.contains(foreignKey)) {
+                newForeignKeys.add(foreignKey);
+            }
+        }
+        for (String primaryKey : primaryKeys) {
+            if (attrs.contains(primaryKey)) {
+                newPrimaryKeys.add(primaryKey);
+            }
+        }
         //making new relation
-        Relation newRel = new RelationImpl(rel.getName(), attrs, t);
+        Relation newRel = new RelationImpl(rel.getName(), attrs, types);
+        ((RelationImpl)newRel).addForeignKeys(newForeignKeys);
+        ((RelationImpl)newRel).addPrimaryKeys(newPrimaryKeys);
 
         //adding the columns/attribute values to the newRel
         for (int i = 0; i < rel.getSize(); i++) {
@@ -140,7 +162,8 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         List <Type> unionTypes = new ArrayList<>();
         unionTypes.addAll(a1Types);
 
-        Relation newRel = new RelationImpl("Difference of " + rel1.getName() + " and " + rel2.getName(), unionAttrs, unionTypes);
+        Relation newRel = new RelationImpl("Difference of " + rel1.getName() + " and " + rel2.getName(),
+                                             unionAttrs, unionTypes);
         List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel1).getForeignKeys().values());
         ((RelationImpl)newRel).addForeignKeys(foreignKeys);
         List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel1).getPrimaryKeys().values());
@@ -220,12 +243,16 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                 throw new IllegalArgumentException("Common attributes present");
             }
         }
-        attrs1.addAll(attrs2);
 
-        List <Type> types = rel1.getTypes();
-        types.addAll(rel2.getTypes());
+        List<String> combinedAttrs = new ArrayList<String>();
+        combinedAttrs.addAll(attrs1);
+        combinedAttrs.addAll(attrs2);
 
-        Relation newRel = new RelationImpl("Cartesion Product of " + rel1.getName() + " and " + rel2.getName(), attrs1, types);;
+        List <Type> combinedTypes = new ArrayList<Type>();
+        combinedTypes.addAll(rel1.getTypes());
+        combinedTypes.addAll(rel2.getTypes());
+
+        Relation newRel = new RelationImpl("Cartesian Product of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
         
         //Cartesian product with double for each loop
         List <List<Cell>> table1 = rel1.getRows();
@@ -256,48 +283,58 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         List <String> attrs2 = rel2.getAttrs();
 
         //Common attribute indexes in rel1 and types
-        List <String> attrs = new ArrayList<>();
-        List <Type> types = new ArrayList<>();
+        List <String> joinedAttrs = new ArrayList<>();
+        List <Type> joinedTypes = new ArrayList<>();
+
+        int counter = 0;
         for (int i = 0; i < attrs1.size() + attrs2.size(); i++) {
             if (i < attrs1.size()) {
-                attrs.add(attrs1.get(i));
-                types.add(rel1.getTypes().get(i));
+                joinedAttrs.add(attrs1.get(i));
+                joinedTypes.add(rel1.getTypes().get(i));
             }
-            else if (i >= attrs1.size() && !attrs.contains(attrs2.get(i%attrs.size()))) {
-                attrs.add(attrs2.get(i%attrs.size()));
-                types.add(rel1.getTypes().get(i%attrs.size()));
-            }
-         }
-        List <String> indices = new ArrayList<>();
-        for (String attr : attrs2) {
-            if (rel1.hasAttr(attr)) {
-                indices.add(attrs2.get(rel1.getAttrIndex(attr)));
+            else if (i >= attrs1.size() && !joinedAttrs.contains(attrs2.get(counter))) {
+                joinedAttrs.add(attrs2.get(counter));
+                joinedTypes.add(rel1.getTypes().get(counter));
+                counter++;
             }
         }
+
+        List <String> indices = new ArrayList<>();
+        for (String attr : attrs1) {
+            try {
+                if (rel2.hasAttr(attr)) {
+                    indices.add(attr);
+                }
+            } catch (IllegalArgumentException e) {}
+        }
+
         // New Relation
-        Relation newRel = new RelationImpl("Natural join of " + rel1.getName() + " and " + rel2.getName(),attrs, types );
+        Relation newRel = new RelationImpl("Natural join of " + rel1.getName() + " and " + rel2.getName(), joinedAttrs, joinedTypes );
         
         //Compare common attribute values and combine
-        boolean same = false;
+        boolean same = true;
         for (List <Cell> row1 : table1) {
             for (List <Cell> row2 : table2) {
+                same = true;
                 for (String attribute : indices) {
-                    if (row1.get(rel1.getAttrIndex(attribute)).toString().equals(row2.get(rel2.getAttrIndex(attribute)).toString())) {
-                        same = true;
-                    }
-                    same = false;
+                    if (!(row1.get(rel1.getAttrIndex(attribute)).toString().equals(row2.get(rel2.getAttrIndex(attribute)).toString()))) {
+                        same = false;
+                    } 
                 }
                 if (same) {
                     //Found the row2 that matches with row1 with common attributes
                     List <Cell> commonRow = new ArrayList<>();
+                    int start = 0;
                     for (int i = 0; i < row1.size() + row2.size(); i++) {
                         if (i < row1.size()) {
                             commonRow.add(row1.get(i));
                         }
-                        else if (i >= row1.size() && !commonRow.contains(row2.get(i%row1.size()))) {
-                            commonRow.add(row2.get(i%row1.size()));
+                        else if (i >= row1.size() && !commonRow.contains(row2.get(start))) {
+                            commonRow.add(row2.get(start));
+                            start++;
                         }
                     }
+                    newRel.insert(commonRow);
                 }
             }
         }
@@ -305,7 +342,41 @@ public class RAImpl implements uga.cs4370.mydb.RA {
     }
     
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'join'");
+        List<String> combinedAttrs = new ArrayList<String>();
+        List<Type> combinedTypes = new ArrayList<Type>();
+        int counter = 0;
+        int sameIndex = -1; 
+        for (int i = 0; i < rel1.getAttrs().size() + rel2.getAttrs().size(); i++) {
+            if (i < rel1.getAttrs().size()) {
+                combinedAttrs.add(rel1.getAttrs().get(i));
+                combinedTypes.add(rel1.getTypes().get(i));
+            } else if (i >= rel1.getAttrs().size() && !combinedAttrs.contains(rel2.getAttrs().get(counter))) {
+                combinedAttrs.add(rel2.getAttrs().get(counter));
+                combinedTypes.add(rel2.getTypes().get(counter));
+                counter++;
+            } else if (combinedAttrs.contains(rel2.getAttrs().get(counter))) {
+                sameIndex = rel1.getAttrs().size() + counter;
+            }
+        }
+        Relation joinedRel = new RelationImpl("Theta join of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
+        List<Cell> checkCombined = new ArrayList<Cell>();
+        for (List<Cell> row1 : rel1.getRows()) {
+            for (List<Cell> row2 : rel2.getRows()) {
+                checkCombined.addAll(row1);
+                checkCombined.addAll(row2);
+                if (p.check(checkCombined)) {
+                    List<Cell> confirmed = new ArrayList<Cell>();
+                    for (int i = 0; i < combinedAttrs.size(); i++) {
+                        if (!(i == sameIndex)) {
+                            confirmed.add(checkCombined.get(i));
+                        }
+                    }
+                    joinedRel.insert(confirmed);
+                }
+                checkCombined.clear();
+            }
+        }
+
+        return joinedRel;
     }
 }

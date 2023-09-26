@@ -30,7 +30,7 @@ public class Main {
         mydb.addRelation(studentsName, attributesOne, typesOne, primaryKeysOne, foreignKeysOne);
 
         List<Cell> rowOne = new ArrayList<Cell>();
-        rowOne.add(new Cell(1234));
+        rowOne.add(new Cell(1111));
         rowOne.add(new Cell("Deven"));
         rowOne.add(new Cell("Allen"));
         rowOne.add(new Cell("2002-03-05"));
@@ -39,7 +39,7 @@ public class Main {
         mydb.getRelations().get(0).insert(rowOne);
 
         List<Cell> rowTwo = new ArrayList<Cell>();
-        rowTwo.add(new Cell(1111));
+        rowTwo.add(new Cell(1234));
         rowTwo.add(new Cell("John"));
         rowTwo.add(new Cell("Doe"));
         rowTwo.add(new Cell("1999-05-22"));
@@ -56,7 +56,7 @@ public class Main {
         String coursesName = "Courses";
         attributesTwo.addAll(Arrays.asList("CourseID", "CName", "Credits"));
         typesTwo.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
-        primaryKeysTwo.add("CourseID");
+       primaryKeysTwo.add("CourseID");
 
         mydb.addRelation(coursesName, attributesTwo, typesTwo, primaryKeysTwo, foreignKeysTwo);
 
@@ -143,5 +143,111 @@ public class Main {
         //relationalAlgebra.diff(relation1, relation2).print();
 
         //relationalAlgebra.rename(mydb.getRelationByName("Courses"), originalAttributes, renamedAttributes).print();
+
+        //relationalAlgebra.cartesianProduct(mydb.getRelationByName("Classes"), mydb.getRelationByName("Students")).print();
+
+        //relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
+                /* Creating Teaches Table */
+                ArrayList<String> attributesFive = new ArrayList<String>();
+                ArrayList<Type> typesFive = new ArrayList<Type>();
+                ArrayList<String> primaryKeysFive = new ArrayList<String>();
+                ArrayList<String> foreignKeysFive = new ArrayList<String>();
+        
+                String teachesName = "Teaches";
+                attributesFive.addAll(Arrays.asList("TeachID", "ProfessorID", "CourseID"));
+                typesFive.addAll(Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER));
+                primaryKeysFive.add("TeachID");
+        
+                /* adding teaches to database*/
+                mydb.addRelation(teachesName, attributesFive, typesFive, primaryKeysFive, foreignKeysFive);
+        
+                List<Cell> TeachesOne = new ArrayList<Cell>();
+                TeachesOne.add(new Cell(301));
+                TeachesOne.add(new Cell(201));
+                TeachesOne.add(new Cell(101));
+        
+                mydb.getRelationByName("Teaches").insert(TeachesOne);
+        
+        
+                List<Cell> TeachesTwo = new ArrayList<Cell>();
+                TeachesTwo.add(new Cell(302));
+                TeachesTwo.add(new Cell(202));
+                TeachesTwo.add(new Cell(102));
+        
+                mydb.getRelationByName("Teaches").insert(TeachesTwo);
+        
+        
+                List<Cell> TeachesThree = new ArrayList<Cell>();
+                TeachesThree.add(new Cell(303));
+                TeachesThree.add(new Cell(203));
+                TeachesThree.add(new Cell(101));
+        
+                mydb.getRelationByName("Teaches").insert(TeachesThree);
+
+        /* Creating Enrollment Table */
+        ArrayList<String> attributesSix = new ArrayList<String>();
+        ArrayList<Type> typesSix = new ArrayList<Type>();
+        ArrayList<String> primaryKeysSix = new ArrayList<String>();
+        ArrayList<String> foreignKeysSix = new ArrayList<String>();
+
+        String enrollmentName = "Enrollment";
+        attributesSix.addAll(Arrays.asList("EnrollmentID", "StudentID", "CourseID", "Grade"));
+        typesSix.addAll(Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER, Type.STRING));
+        primaryKeysSix.add("EnrollmentID");
+
+        /* adding enrollment to database*/
+        mydb.addRelation(enrollmentName, attributesSix, typesSix, primaryKeysSix, foreignKeysSix);
+
+        /* adding enrollment values */
+        List<Cell> EnrollmentOne = new ArrayList<Cell>();
+        EnrollmentOne.add(new Cell(1));
+        EnrollmentOne.add(new Cell(1234));
+        EnrollmentOne.add(new Cell(101));
+        EnrollmentOne.add(new Cell("A"));
+
+        mydb.getRelationByName("Enrollment").insert(EnrollmentOne);
+
+
+        List<Cell> EnrollmentTwo = new ArrayList<Cell>();
+        EnrollmentTwo.add(new Cell(2));
+        EnrollmentTwo.add(new Cell(1234));
+        EnrollmentTwo.add(new Cell(102));
+        EnrollmentTwo.add(new Cell("B"));
+ 
+        mydb.getRelationByName("Enrollment").insert(EnrollmentTwo);
+
+
+        List<Cell> EnrollmentThree = new ArrayList<Cell>();
+        EnrollmentThree.add(new Cell(3));
+        EnrollmentThree.add(new Cell(1111));
+        EnrollmentThree.add(new Cell(101));
+        EnrollmentThree.add(new Cell("B"));
+
+        mydb.getRelationByName("Enrollment").insert(EnrollmentThree);
+
+
+        List<Cell> EnrollmentFour = new ArrayList<Cell>();
+        EnrollmentFour.add(new Cell(4));
+        EnrollmentFour.add(new Cell(1111));
+        EnrollmentFour.add(new Cell(102));
+        EnrollmentFour.add(new Cell("C"));
+ 
+        mydb.getRelationByName("Enrollment").insert(EnrollmentFour);
+
+
+        List<Cell> EnrollmentFive = new ArrayList<Cell>();
+        EnrollmentFive.add(new Cell(5));
+        EnrollmentFive.add(new Cell(1111));
+        EnrollmentFive.add(new Cell(103));
+        EnrollmentFive.add(new Cell("A"));
+ 
+        mydb.getRelationByName("Enrollment").insert(EnrollmentFive);
+
+        mydb.getRelationByName("Enrollment").print();
+        mydb.getRelationByName("Teaches").print();
+
+        Predicate p3 = new PredicateImpl(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches"), "CourseID=CourseID");
+        relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches"), p3).print();
+        relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches")).print();
     }
 }
