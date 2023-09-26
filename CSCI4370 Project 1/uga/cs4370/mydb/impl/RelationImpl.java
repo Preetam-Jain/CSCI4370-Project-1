@@ -175,7 +175,7 @@ public class RelationImpl implements Relation {
                 System.out.print(table.get(i).get(j));
                 String convert = table.get(i).get(j).toString();
                 int len = findLengthDifference(j) - convert.length();
-                if (len < attrs.get(j).length()) {
+                if (len < attrs.get(j).length() - convert.length()) {
                     len = attrs.get(j).length() - convert.length();
                 }
                 if (len > 0) {

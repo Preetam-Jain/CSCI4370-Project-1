@@ -8,6 +8,7 @@ import uga.cs4370.mydb.Cell;
 import uga.cs4370.mydb.Type;
 import uga.cs4370.mydb.Predicate;
 import uga.cs4370.mydb.RA;
+import uga.cs4370.mydb.Relation;
 
 
 public class Main {
@@ -101,6 +102,13 @@ public class Main {
  
         mydb.getRelationByName("Classes").insert(rowSix);
 
+        List<Cell> rowSeven = new ArrayList<Cell>();
+        rowSeven.add(new Cell(105));
+        rowSeven.add(new Cell("Introduction to Programming"));
+        rowSeven.add(new Cell(4));
+ 
+        mydb.getRelationByName("Classes").insert(rowSeven);
+
         Predicate p0 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
         Predicate p1 = new PredicateImpl("StudentID=\"1234\"", mydb.getRelationByName("Students").getAttrs());
         RA relationalAlgebra = new RAImpl();
@@ -110,7 +118,13 @@ public class Main {
 
 
         List<String> projectedAttributes1 = new ArrayList<String>();
-        projectedAttributes1.addAll(Arrays.asList("CourseID", "CName"));
+        projectedAttributes1.addAll(Arrays.asList("CName"));
+
+        List<String> originalAttributes = new ArrayList<String>();
+        originalAttributes.addAll(Arrays.asList("CName", "Credits"));
+
+        List<String> renamedAttributes = new ArrayList<String>();
+        renamedAttributes.addAll(Arrays.asList("Course Name", "Hours"));
 
         //mydb.getRelationByName("Students").print();
         //mydb.getRelationByName("Courses").print();
@@ -121,8 +135,13 @@ public class Main {
 
         //relationalAlgebra.project(mydb.getRelationByName("Students"), projectedAttributes).print();
 
-        //relationalAlgebra.project(mydb.getRelationByName("Courses"), projectedAttributes1).print();
+        //Relation relation1 = relationalAlgebra.project(mydb.getRelationByName("Courses"), projectedAttributes1);
+        //Relation relation2 = relationalAlgebra.project(mydb.getRelationByName("Classes"), projectedAttributes1);
 
-        relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
+        //relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
+
+        //relationalAlgebra.diff(relation1, relation2).print();
+
+        //relationalAlgebra.rename(mydb.getRelationByName("Courses"), originalAttributes, renamedAttributes).print();
     }
 }

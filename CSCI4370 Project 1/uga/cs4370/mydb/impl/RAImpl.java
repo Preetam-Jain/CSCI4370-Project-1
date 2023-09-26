@@ -97,6 +97,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         ((RelationImpl)newRel).addForeignKeys(foreignKeys);
         List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel1).getPrimaryKeys().values());
         ((RelationImpl)newRel).addPrimaryKeys(primaryKeys);
+
         //Building the new union relation
         int counter = 0;
         for (int i = 0; i < (rel1.getSize() + rel2.getSize()); i++) { //building new cells array for every row
@@ -120,50 +121,44 @@ public class RAImpl implements uga.cs4370.mydb.RA {
      * @throws IllegalArgumentException If rel1 and rel2 are not compatible.
      */
     public Relation diff(Relation rel1, Relation rel2) {
-        //Assume that primary keys, or IDs, are the first value
-        List <List<Cell>> table1 = rel1.getRows();
-        List <List<Cell>> table2 = rel2.getRows();
+
+        if (rel1.getAttrs().size() != rel2.getAttrs().size()) {
+            throw new IllegalArgumentException("Relations are not compatible for union");
+        }
 
         List <String> attrs1 = rel1.getAttrs();
-        List <String> attrs2 = rel2.getAttrs();
-        List <String> unionAttr = new ArrayList<>();
 
-        List <Type> types = new ArrayList<>();
         List <Type> a1Types = rel1.getTypes();
         List <Type> a2Types = rel2.getTypes();
-        
-        for (int i = 0; i < (attrs1.size() + attrs2.size()); i++) {
-            if (i < attrs1.size()) {
-                unionAttr.add(attrs1.get(i));
-                types.add(a1Types.get(rel1.getAttrIndex(attrs1.get(i))));
-            }
-            if (i >= attrs1.size() && !unionAttr.contains(attrs2.get(i%attrs1.size()))) {
-                unionAttr.add(attrs2.get(i%attrs1.size()));
-                types.add(a2Types.get(rel2.getAttrIndex(attrs2.get(i%attrs2.size()))));
-            }
-        }
-        Relation newRel = new RelationImpl("Difference of " + rel1 + " and " + rel2, unionAttr, types);
 
+        if (!a1Types.equals(a2Types)) {
+            throw new IllegalArgumentException("Relations are not compatible for union");
+        }
+
+        List <String> unionAttrs = new ArrayList<>();
+        unionAttrs.addAll(attrs1);
+        List <Type> unionTypes = new ArrayList<>();
+        unionTypes.addAll(a1Types);
+
+        Relation newRel = new RelationImpl("Difference of " + rel1.getName() + " and " + rel2.getName(), unionAttrs, unionTypes);
+        List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel1).getForeignKeys().values());
+        ((RelationImpl)newRel).addForeignKeys(foreignKeys);
+        List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel1).getPrimaryKeys().values());
+        ((RelationImpl)newRel).addPrimaryKeys(primaryKeys);
+
+        boolean add = true;
         for (int i = 0; i < rel1.getSize(); i++) {
+            add = true;
             for (int j = 0; j < rel2.getSize(); j++) {
-                List <Cell> row = table1.get(i);
-                String id = row.get(0).toString();
-                if (!table2.get(j).get(0).toString().equals(id)) {
-                    newRel.insert(row);
+                if (rel1.getRows().get(i).equals(rel2.getRows().get(j))) {
+                    add = false;
                 }
             }
-        }
-        for (int i = 0; i < rel2.getSize(); i++) {
-            for (int j = 0; j < rel1.getSize(); j++) {
-                List <Cell> row = table2.get(i);
-                String id = row.get(0).toString();
-                if (!table1.get(j).get(0).toString().equals(id)) {
-                    newRel.insert(row);
-                }
+            if (add) {
+                List <Cell> cells = new ArrayList<>();
+                cells.addAll(rel1.getRows().get(i));
+                newRel.insert(cells);
             }
-        }
-        if (newRel.getSize()==0) {
-            throw new IllegalArgumentException("Relations are incompatible");
         }
         return newRel;
     }
@@ -181,14 +176,31 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         if (origAttr.size() != renamedAttr.size()) {
             throw new IllegalArgumentException("Uneven attribute counts");
         }
-        if (!rel.getAttrs().equals(origAttr)) {
+        if (!rel.getAttrs().containsAll(origAttr)) {
             throw new IllegalArgumentException("Attributes dont match or not present in the relation");
         }
-        Relation renamed = new RelationImpl(rel.getName(), renamedAttr, rel.getTypes());
-        List <List<Cell>> table = rel.getRows();
-        for (List <Cell> row : table) {
-            renamed.insert(row);
+        List<String> newAttrs = new ArrayList<String>();
+        for (int i = 0; i < rel.getAttrs().size(); i++) {
+            if (origAttr.contains(rel.getAttrs().get(i))) {
+                newAttrs.add(renamedAttr.get(origAttr.indexOf(rel.getAttrs().get(i))));
+            } else {
+                newAttrs.add(rel.getAttrs().get(i));
+            }
         }
+        Relation renamed = new RelationImpl(rel.getName(), newAttrs, rel.getTypes());
+        List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel).getForeignKeys().values());
+        ((RelationImpl)renamed).addForeignKeys(foreignKeys);
+        List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel).getPrimaryKeys().values());
+        ((RelationImpl)renamed).addPrimaryKeys(primaryKeys);
+
+        List <List<Cell>> table = rel.getRows();
+
+        for (List <Cell> row : table) {
+            List<Cell> cells = new ArrayList<Cell>();
+            cells.addAll(row);
+            renamed.insert(cells);
+        }
+
         return renamed;
     }
 

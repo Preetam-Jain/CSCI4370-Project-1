@@ -24,6 +24,10 @@ public class Database {
         this.relations.add(toBeAdded);
     }
 
+    public void addRelation(Relation relation) {
+        relations.add(relation);
+    }
+
     public List<Relation> getRelations() {
         return this.relations;
     }
