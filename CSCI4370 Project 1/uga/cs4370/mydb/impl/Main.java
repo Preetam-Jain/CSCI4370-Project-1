@@ -109,8 +109,8 @@ public class Main {
  
         mydb.getRelationByName("Classes").insert(rowSeven);
 
-        Predicate p0 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
-        Predicate p1 = new PredicateImpl("StudentID=\"1234\"", mydb.getRelationByName("Students").getAttrs());
+        //Predicate p0 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
+        //Predicate p1 = new PredicateImpl("StudentID=\"1234\"", mydb.getRelationByName("Students").getAttrs());
         RA relationalAlgebra = new RAImpl();
 
         List<String> projectedAttributes = new ArrayList<String>();
@@ -242,11 +242,14 @@ public class Main {
  
         mydb.getRelationByName("Enrollment").insert(EnrollmentFive);
 
+        //mydb.getRelationByName("Enrollment").print();
         mydb.getRelationByName("Enrollment").print();
-        mydb.getRelationByName("Courses").print();
 
-        Predicate p3 = new PredicateImpl(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses"), "CourseID=CourseID");
+        //Predicate p3 = new PredicateImpl(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses"), "CourseID=CourseID");
         //relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches"), p3).print();
-        relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses")).print();
+        //relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses")).print();
+
+        Predicate p4 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Enrollment").getAttrs());
+        relationalAlgebra.select(mydb.getRelationByName("Enrollment"), p4).print();
     }
 }

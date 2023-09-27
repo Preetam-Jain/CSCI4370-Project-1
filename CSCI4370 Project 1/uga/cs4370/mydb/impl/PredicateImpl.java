@@ -11,17 +11,46 @@ public class PredicateImpl implements uga.cs4370.mydb.Predicate {
     private String attribute = "";
     private String attribute2 = "";
     private String attrValue = "";
-    private List <String> attributes = new ArrayList<>();
+    private String condition;
+    private int index;
     private int firstIndex;
     private int lastIndex;
 
-    public PredicateImpl (String condition, List <String> attributes) {
-        this.attributes = attributes;
-        if (condition.contains("\"")) { //Ex. attr = "specific value"
+    public PredicateImpl (String condition, List<String> attributes) {
+        this.condition = condition;
+        if (condition.contains("\"")&&condition.contains(">=")) { //Ex. attr = "specific value"
+            String[] parts = condition.split(">=");
+            attribute = parts[0];
+            attrValue = parts[1];
+            attrValue = attrValue.substring(1, attrValue.length()-1);//get rid of quotations
+        }
+        else if (condition.contains("\"")&&condition.contains("<=")) { //Ex. attr = "specific value"
+            String[] parts = condition.split("<=");
+            attribute = parts[0];
+            attrValue = parts[1];
+            attrValue = attrValue.substring(1, attrValue.length()-1);//get rid of quotations
+        }
+        else if (condition.contains("\"")&&condition.contains("=")) { //Ex. attr = "specific value"
             String[] parts = condition.split("=");
             attribute = parts[0];
             attrValue = parts[1];
             attrValue = attrValue.substring(1, attrValue.length()-1);//get rid of quotations
+        }
+        else if (condition.contains("\"")&&condition.contains(">")) { //Ex. attr = "specific value"
+            String[] parts = condition.split(">");
+            attribute = parts[0];
+            attrValue = parts[1];
+            attrValue = attrValue.substring(1, attrValue.length()-1);//get rid of quotations
+        }
+        else if (condition.contains("\"")&&condition.contains("<")) { //Ex. attr = "specific value"
+            String[] parts = condition.split("<");
+            attribute = parts[0];
+            attrValue = parts[1];
+            attrValue = attrValue.substring(1, attrValue.length()-1);//get rid of quotations
+        }
+        this.index = attributes.indexOf(attribute);
+        if (index == -1) {
+            throw new IllegalArgumentException("Attribute not found within selected attributes");
         }
     }
 
@@ -51,16 +80,56 @@ public class PredicateImpl implements uga.cs4370.mydb.Predicate {
      * if the row passes the predicate.
      */
     public boolean check(List<Cell> row) {
-        int index1 = -1;
-        
-        if (!attrValue.equals("")) { //CASE 1: attr = "specific value"
-            for (int i = 0; i < attributes.size(); i++) {//find index of attribute1
-                if (attributes.get(i).equals(attribute)) {
-                    index1 = i;
+
+        if (!attrValue.equals("")) { //CASE 1: "specific value"
+            int maybe = -1;
+            double maybe1 = -1;
+            String maybe2 = null;
+            try {
+                maybe = Integer.parseInt(attrValue);
+            }
+            catch (Exception e) {
+                try {
+                    maybe1 = Double.parseDouble(attrValue);
+                } catch (Exception f) {
+                    maybe2 = attrValue;
                 }
             }
-            //found the index
-            if (row.get(index1).toString().equals(attrValue)) {
+            if (maybe != -1) {
+                if (condition.contains(">=") && row.get(this.index).getAsInt() >= (maybe)) {
+                    return true;
+                }
+                else if (condition.contains("<=") && row.get(this.index).getAsInt() <= (maybe)) {
+                    return true;
+                }
+                else if (condition.contains("=") && row.get(this.index).getAsInt() == (maybe)) {
+                    return true;
+                }
+                else if (condition.contains(">") && row.get(this.index).getAsInt() > (maybe)) {
+                    return true;
+                }
+                else if (condition.contains("<") && row.get(this.index).getAsInt() < (maybe)) {
+                    return true;
+                }
+                return false;
+            } else if (maybe1 != -1) {
+                if (condition.contains(">=") && row.get(this.index).getAsDouble() >= (maybe1)) {
+                    return true;
+                }
+                else if (condition.contains("<=") && row.get(this.index).getAsDouble() <= (maybe1)) {
+                    return true;
+                }
+                else if (condition.contains("=") && row.get(this.index).getAsDouble() == (maybe1)) {
+                    return true;
+                }
+                else if (condition.contains(">") && row.get(this.index).getAsDouble() > (maybe1)) {
+                    return true;
+                }
+                else if (condition.contains("<") && row.get(this.index).getAsDouble() < (maybe1)) {
+                    return true;
+                }
+                return false;
+            } else if (row.get(this.index).toString().equals(maybe2)) {
                 return true;
             }
         }
