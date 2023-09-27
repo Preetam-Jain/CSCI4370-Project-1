@@ -3,6 +3,7 @@ package uga.cs4370.mydb.impl;
 import java.util.ArrayList;
 import java.util.List;
 import uga.cs4370.mydb.*;
+import uga.cs4370.mydb.Relation;
 
 public class RAImpl implements uga.cs4370.mydb.RA {
     // add support for foreign and primary keys to be saved when you select and project
@@ -82,6 +83,30 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                 row.add(rel.getRows().get(i).get(rel.getAttrIndex(attr)));
             }
             newRel.insert(row);
+        }
+        return newRel;
+    }
+
+    public Relation distinct(Relation rel, List<String> attrs) {
+        Relation newRel = builder.newRelation("Distinct " + rel.getName(), rel.getAttrs(), rel.getTypes());
+        List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel).getForeignKeys().values());
+        List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel).getPrimaryKeys().values());
+        ((RelationImpl)newRel).addForeignKeys(foreignKeys);
+        ((RelationImpl)newRel).addPrimaryKeys(primaryKeys);
+        for (List<Cell> row: rel.getRows()) {
+            boolean same = false;
+            for (int i = 0; i < attrs.size(); i++) {
+                for (int j = 0; j < newRel.getSize(); j++) {
+                    if (row.get(i).toString().equals(newRel.getRows().get(j).get(i).toString())) {
+                        same = true;
+                    }
+                }
+            }
+            if (!same) {
+                List<Cell> newRow = new ArrayList<Cell>();
+                newRow.addAll(row);
+                newRel.insert(newRow);
+            }
         }
         return newRel;
     }
@@ -343,7 +368,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         }
         return newRel;
     }
-    
+
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
         List<String> combinedAttrs = new ArrayList<String>();
         List<Type> combinedTypes = new ArrayList<Type>();
@@ -381,7 +406,6 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                 checkCombined.clear();
             }
         }
-
         return joinedRel;
     }
 }
