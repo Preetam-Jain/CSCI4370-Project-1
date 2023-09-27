@@ -17,7 +17,16 @@ public class Main {
 
         /* ASSIGNMENT ONE SCHEMA CREATION PLUS ADDING VALUES */
         
-        /* Creating Students Table */
+        /* Creating Students Table 
+         * Corresponds to the following query: 
+         * CREATE TABLE Students (
+         * StudentID INT PRIMARY KEY,
+         * FName VARCHAR(255),
+         * LName VARCHAR(255),
+         * DoB DATE,
+         * Major VARCHAR(255)
+         * );
+        */
         ArrayList<String> attributesOne = new ArrayList<String>();
         ArrayList<Type> typesOne = new ArrayList<Type>();
         ArrayList<String> primaryKeysOne = new ArrayList<String>();
@@ -31,7 +40,14 @@ public class Main {
         /* Adding Students to database*/
         mydb.addRelation(studentsName, attributesOne, typesOne, primaryKeysOne, foreignKeysOne);
 
-        /* adding students */
+        /* adding students: Associated with the following query:
+         * INSERT INTO Students (StudentID, FName, LName, DoB, Major) 
+         * VALUES (1234, 'Deven', 'Allen', '2002-03-05', 'Computer Science'), 
+         * (1111, 'John', 'Doe', '1999-05-22', 'Computer Science'), 
+         * (2222, 'Jane', 'Smith', '2000-06-15', 'Electrical Engineering'),
+         * (3333, 'Sarah', 'Johnson', '1995-03-20', 'Physics'),
+         * (4444, 'Mike', 'Carl', '1999-04-25', 'Computer Science');
+        */
         List<Cell> studentOne = new ArrayList<Cell>();
         studentOne.add(new Cell(1234));
         studentOne.add(new Cell("Deven"));
@@ -82,7 +98,14 @@ public class Main {
         mydb.getRelations().get(0).insert(StudentFive);
 
 
-        /* Creating Courses Table */
+        /* Creating Courses Table:
+         * Corresponds to the following query:
+         * CREATE TABLE Courses (
+         * CourseID INT PRIMARY KEY,
+         * CName VARCHAR(255),
+         * Credits INT
+         * );
+         */
         ArrayList<String> attributesTwo = new ArrayList<String>();
         ArrayList<Type> typesTwo = new ArrayList<Type>();
         ArrayList<String> primaryKeysTwo = new ArrayList<String>();
@@ -96,7 +119,14 @@ public class Main {
         /* adding courses to database*/
         mydb.addRelation(coursesName, attributesTwo, typesTwo, primaryKeysTwo, foreignKeysTwo);
         
-        /* Adding Courses */
+        /* Adding Courses 
+         * Corresponds to the following query:
+         * INSERT INTO Courses (CourseID, CName, Credits)
+         *  VALUES
+         *  (101, 'Introduction to Programming', 3),
+         *  (102, 'Database Management', 4),
+         *  (103, 'PE', 1);
+        */
         List<Cell> CourseOne = new ArrayList<Cell>();
         CourseOne.add(new Cell(101));
         CourseOne.add(new Cell("Introduction to Programming"));
@@ -120,24 +150,17 @@ public class Main {
  
         mydb.getRelationByName("Courses").insert(CoursePE);
 
-        /* 
-        List<Cell> CourseThree = new ArrayList<Cell>();
-        CourseThree.add(new Cell(103));
-        CourseThree.add(new Cell("Software Engineering"));
-        CourseThree.add(new Cell(3));
-
-        mydb.getRelationByName("Courses").insert(CourseThree);
-
-
-        List<Cell> CourseFour = new ArrayList<Cell>();
-        CourseFour.add(new Cell(104));
-        CourseFour.add(new Cell("Data Structures"));
-        CourseFour.add(new Cell(4));
- 
-        mydb.getRelationByName("Courses").insert(CourseFour);
+        /* Creating Enrollment Table:
+         * Corresponds to the following query:
+         * CREATE TABLE Enrollment (
+         * EnrollmentID INT PRIMARY KEY,
+         * StudentID INT,
+         * CourseID INT,
+         * grade VARCHAR(2),
+         * FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+         * FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+         * );
         */
-
-        /* Creating Enrollment Table */
         ArrayList<String> attributesThree = new ArrayList<String>();
         ArrayList<Type> typesThree = new ArrayList<Type>();
         ArrayList<String> primaryKeysThree = new ArrayList<String>();
@@ -147,11 +170,24 @@ public class Main {
         attributesThree.addAll(Arrays.asList("EnrollmentID", "StudentID", "CourseID", "Grade"));
         typesThree.addAll(Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER, Type.STRING));
         primaryKeysThree.add("EnrollmentID");
+        foreignKeysThree.add("StudentID");
+        foreignKeysThree.add("CourseID");
+
 
         /* adding enrollment to database*/
         mydb.addRelation(enrollmentName, attributesThree, typesThree, primaryKeysThree, foreignKeysThree);
-
-        /* adding enrollment values */
+    
+        /* adding enrollment values 
+         * Corresponds to the following query:
+         * INSERT INTO Enrollment (EnrollmentID, StudentID, CourseID, grade) 
+         * VALUES 
+         * (1, 1234, 101, 'A'), 
+         * (2, 1234, 102, 'B'), 
+         * (3, 1111, 101, 'B'), 
+         * (4, 1111, 102, 'C'), 
+         * (5, 1111, 103, 'A'),
+         * (6, 4444, 101, 'F');
+        */
         List<Cell> EnrollmentOne = new ArrayList<Cell>();
         EnrollmentOne.add(new Cell(1));
         EnrollmentOne.add(new Cell(1234));
@@ -203,11 +239,18 @@ public class Main {
         EnrollmentSix.add(new Cell(101));
         EnrollmentSix.add(new Cell("F"));
  
-        // THIS IS THE LINE WHERE THE OOB ERROR HAPPENS
         mydb.getRelationByName("Enrollment").insert(EnrollmentSix);
 
 
-        /* Creating Professors Table */
+        /* Creating Professors Table 
+         * Corresponds to the following query:
+         * CREATE TABLE Professors (
+         * ProfessorID INT PRIMARY KEY,
+         * FName VARCHAR(255),
+         * LName VARCHAR(255),
+         * department VARCHAR(255)
+         * );
+        */
         ArrayList<String> attributesFour = new ArrayList<String>();
         ArrayList<Type> typesFour = new ArrayList<Type>();
         ArrayList<String> primaryKeysFour = new ArrayList<String>();
@@ -221,7 +264,14 @@ public class Main {
         /* adding professors to database*/
         mydb.addRelation(professorsName, attributesFour, typesFour, primaryKeysFour, foreignKeysFour);
 
-        /* adding professor values */
+        /* adding professor values 
+         * Corresponds to the following query:
+         * INSERT INTO Professors (ProfessorID, FName, LName, department) 
+         * VALUES
+         * (201, 'Carl', 'Smith', 'Computer Science'), 
+         * (202, 'Steve', 'Allen', 'Electrical Engineering'), 
+         * (203, 'Matthew', 'Mack', 'Computer Science');
+        */
         List<Cell> ProfessorOne = new ArrayList<Cell>();
         ProfessorOne.add(new Cell(201));
         ProfessorOne.add(new Cell("Carl"));
@@ -250,7 +300,16 @@ public class Main {
 
 
 
-        /* Creating Teaches Table */
+        /* Creating Teaches Table 
+         * Corresponds to the following query:
+         * CREATE TABLE Teaches (
+         * TeachID INT PRIMARY KEY,
+         * ProfessorID INT,
+         * CourseID INT,
+         * FOREIGN KEY (ProfessorID) REFERENCES Professors(ProfessorID),
+         * FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+         * );
+        */
         ArrayList<String> attributesFive = new ArrayList<String>();
         ArrayList<Type> typesFive = new ArrayList<Type>();
         ArrayList<String> primaryKeysFive = new ArrayList<String>();
@@ -264,6 +323,14 @@ public class Main {
         /* adding teaches to database*/
         mydb.addRelation(teachesName, attributesFive, typesFive, primaryKeysFive, foreignKeysFive);
 
+        /* adding teaches values
+         * Corresponds to the following query:
+         * INSERT INTO Teaches (TeachID, ProfessorID, CourseID) 
+         * VALUES 
+         * (301, 201, 101), 
+         * (302, 202, 102), 
+         * (303, 203, 101);
+        */
         List<Cell> TeachesOne = new ArrayList<Cell>();
         TeachesOne.add(new Cell(301));
         TeachesOne.add(new Cell(201));
@@ -287,80 +354,87 @@ public class Main {
 
         mydb.getRelationByName("Teaches").insert(TeachesThree);
 
+
         /* THIS CONCLUDES ADDING ALL THE TABLES AND VALUES FROM ASSIGNMENT 1 */
-
-
-        /* adding classes??? */
-        ArrayList<String> attributesExtra = new ArrayList<String>();
-        ArrayList<Type> typesExtra = new ArrayList<Type>();
-        ArrayList<String> primaryKeysExtra = new ArrayList<String>();
-        ArrayList<String> foreignKeysExtra = new ArrayList<String>();
-
-        String className = "Classes";
-        attributesExtra.addAll(Arrays.asList("CourseID", "CName", "Credits"));
-        typesExtra.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
-        primaryKeysExtra.add("CourseID");
-        mydb.addRelation(className, attributesExtra, typesExtra, primaryKeysExtra, foreignKeysExtra);
 
 
         RA relationalAlgebra = new RAImpl();
 
-        List<String> projectedAttributes = new ArrayList<String>();
-        projectedAttributes.addAll(Arrays.asList("FName", "LName", "DoB"));
-
-
-        List<String> projectedAttributes1 = new ArrayList<String>();
-        projectedAttributes1.addAll(Arrays.asList("CourseID", "CName"));
-
-
         /* IMPLEMENTING QUERIES FROM ASSIGNMENT 1 */
 
-        // Question 1
+        /* Question 1
+         * Corresponds to the following RA statement:
+         * πCourseID(σStudentID=”1234”(Enrollment))
+         */
         Predicate p1 = new PredicateImpl("StudentID=\"1234\"", mydb.getRelationByName("Enrollment").getAttrs());
         List<String> q1Attrs = new ArrayList<String>();
         q1Attrs.addAll(Arrays.asList("CourseID"));
+        System.out.println("Question 1 Query result:");
         relationalAlgebra.project(relationalAlgebra.select(mydb.getRelationByName("Enrollment"), p1), q1Attrs).print();
 
-        // Question 2
+        /* Question 2
+         * Corresponds to the following RA statement:
+         * πFName,LName,StudentID(σMajor=”Computer Science”(Students))
+         */
         Predicate p2 = new PredicateImpl("Major=\"Computer Science\"", mydb.getRelationByName("Students").getAttrs());
         List<String> q2Attrs = new ArrayList<String>();
         q2Attrs.addAll(Arrays.asList("FName", "LName", "StudentID"));
+        System.out.println("Question 2 Query result:");
         relationalAlgebra.project(relationalAlgebra.select(mydb.getRelationByName("Students"), p2), q2Attrs).print();
 
-        // Question 3
+        /* Question 3
+         * Corresponds to the following RA statement:
+         * πCName(σStudentID=”1234”(Enrollment⨝Courses))
+         */
         Relation R3 = relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses"));
         Predicate p3 = new PredicateImpl("StudentID=\"1234\"", ((RelationImpl)R3).getAttrs());
         List<String> q3Attrs = new ArrayList<String>();
         q3Attrs.addAll(Arrays.asList("CName"));
+        System.out.println("Question 3 Query result:");
         relationalAlgebra.project(relationalAlgebra.select(R3, p3), q3Attrs).print();
 
-        // Question 4
+        /* Question 4
+         * Corresponds to the following RA statement:
+         * πFName,LName,ProfessorID(σCredits>2(Teaches⨝Professors⨝Courses))
+         */
         Relation R4_1 = relationalAlgebra.join(mydb.getRelationByName("Teaches"), mydb.getRelationByName("Professors"));
         Relation R4 = relationalAlgebra.join(mydb.getRelationByName("Courses"),R4_1);
         Predicate p4 = new PredicateImpl("Credits>\"2\"", ((RelationImpl)R4).getAttrs());
         List<String> q4Attrs = new ArrayList<String>();
         q4Attrs.addAll(Arrays.asList("FName", "LName", "ProfessorID"));
+        System.out.println("Question 4 Query result:");
         relationalAlgebra.project(relationalAlgebra.select(R4, p4), q4Attrs).print();
 
         
-        // Question 5
+        /* Question 5
+         * Corresponds to the following RA statement:
+         * πFName,LName,StudentID(Students) - πFName,LName,StudentID(Students⨝Enrollment)
+         */
         Relation R5_1 = relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment"));
         List<String> q5Attrs = new ArrayList<String>();
         q5Attrs.addAll(Arrays.asList("FName", "LName", "StudentID"));
         Relation R5_Proj1 = relationalAlgebra.project(mydb.getRelationByName("Students"), q5Attrs);
         Relation R5_Proj2 = relationalAlgebra.project(R5_1, q5Attrs);
+        System.out.println("Question 5 Query result:");
         relationalAlgebra.diff(R5_Proj1, R5_Proj2).print();
 
 
-        // Question 6
+        /* Question 6
+         * Corresponds to the following RA statement:
+         * πCourseID, CName(Courses) - πCourseID, CName(Courses⨝Teaches)
+         */
         Relation R6_1 = relationalAlgebra.join(mydb.getRelationByName("Courses"), mydb.getRelationByName("Teaches"));
         List<String> q6Attrs = new ArrayList<String>();
         q6Attrs.addAll(Arrays.asList("CourseID", "CName"));
         Relation R6_Proj1 = relationalAlgebra.project(mydb.getRelationByName("Courses"), q6Attrs);
         Relation R6_Proj2 = relationalAlgebra.project(R6_1, q6Attrs);
+        System.out.println("Question 6 Query result:");
         relationalAlgebra.diff(R6_Proj1, R6_Proj2).print();
 
-        // Question 7
+        /* Question 7
+         * Corresponds to the following RA statement:
+         * πFName,LName,StudentID(σMajor=”Computer Science” ^ σgrade=”F” (Enrollment⨝Students))
+         */
         List<String> q7Attrs = new ArrayList<String>();
         q7Attrs.addAll(Arrays.asList("FName", "LName", "StudentID"));
         Relation R7_1 = relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Students"));
@@ -368,10 +442,15 @@ public class Main {
         Relation R7_2 = relationalAlgebra.select(R7_1, p7_1);
         Predicate p7_2 = new PredicateImpl("Major=\"Computer Science\"", ((RelationImpl)R7_2).getAttrs());
         Relation R7_3 = relationalAlgebra.select(R7_2, p7_2);
+        System.out.println("Question 7 Query result:");
         relationalAlgebra.project(R7_3, q7Attrs).print();
 
-        // Question 8
+        /* Question 8
+         * Corresponds to the following RA statement:
+         * πProfessors.FName,Professors.LName,Professors.ProfessorID (σMajor=”Computer Science”(Students ⨝ Enrollment ⨝ Teaches ⨝ Professors))
+         */
         List<String> q8Attrs = new ArrayList<String>();
+        mydb.getRelationByName("Professors").print();
         q8Attrs.addAll(Arrays.asList("Professor.ProfessorID", "Professor.FName", "Professor.LName", "Department"));
         Relation R8_rename = relationalAlgebra.rename(mydb.getRelationByName("Professors"), mydb.getRelationByName("Professors").getAttrs(), q8Attrs);
         Relation R8_1 = relationalAlgebra.join(mydb.getRelationByName("Teaches"), R8_rename);
@@ -382,44 +461,84 @@ public class Main {
         Relation R8_5 = relationalAlgebra.select(R8_4, p8_1);
         List<String> q8Attrs_2 = new ArrayList<String>();
         q8Attrs_2.addAll(Arrays.asList("Professor.ProfessorID", "Professor.FName", "Professor.LName"));
-        relationalAlgebra.project(R8_5, q8Attrs_2).print();
+        Relation R8_6 = relationalAlgebra.project(R8_5, q8Attrs_2);
+        System.out.println("Question 8 Query result:");
+        ((RAImpl)relationalAlgebra).distinct(R8_6, q8Attrs_2).print();
 
 
+        System.out.println("Meaningful Queries:");
+        
+        // Select
+        System.out.println("Selecting the students who have the last name Doe");
+        Predicate selectTest = new PredicateImpl("LName=\"Doe\"", mydb.getRelationByName("Students").getAttrs());
+        relationalAlgebra.select(mydb.getRelationByName("Students"), selectTest).print();
+
+        // Project
+        System.out.println("Projecting the list of professors:");
+        relationalAlgebra.project(mydb.getRelationByName("Professors"), mydb.getRelationByName("Professors").getAttrs()).print();
+
+        // Union
+        System.out.println("Union between courses and classes:");
+        /* adding classes */
+        ArrayList<String> attributesExtra = new ArrayList<String>();
+        ArrayList<Type> typesExtra = new ArrayList<Type>();
+        ArrayList<String> primaryKeysExtra = new ArrayList<String>();
+        ArrayList<String> foreignKeysExtra = new ArrayList<String>();
+
+        String className = "Classes";
+        attributesExtra.addAll(Arrays.asList("ClassID", "CName", "Credits"));
+        typesExtra.addAll(Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        primaryKeysExtra.add("ClassID");
+        mydb.addRelation(className, attributesExtra, typesExtra, primaryKeysExtra, foreignKeysExtra);
+
+        List<Cell> ClassOne = new ArrayList<Cell>();
+        ClassOne.add(new Cell(500));
+        ClassOne.add(new Cell("Software Engineering"));
+        ClassOne.add(new Cell(3));
+
+        mydb.getRelationByName("Classes").insert(ClassOne);
 
 
-        //mydb.getRelationByName("Students").print();
-        //mydb.getRelationByName("Courses").print();
-        //mydb.getRelationByName("Classes").print();
-        //mydb.getRelationByName("Enrollment").print();
+        List<Cell> ClassTwo = new ArrayList<Cell>();
+        ClassTwo.add(new Cell(501));
+        ClassTwo.add(new Cell("Data Structures"));
+        ClassTwo.add(new Cell(4));
+ 
+        mydb.getRelationByName("Classes").insert(ClassTwo);
 
-        //relationalAlgebra.select(mydb.getRelationByName("Students"), p0).print();
-        //relationalAlgebra.select(mydb.getRelationByName("Students"), p1).print();
+        relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
+        
+        // Diff
+        System.out.println("Diff between courses and classes: (Minus Software Engineering)");
 
-        //relationalAlgebra.project(mydb.getRelationByName("Students"), projectedAttributes).print();
+        List<Cell> CourseThree = new ArrayList<Cell>();
+        CourseThree.add(new Cell(500));
+        CourseThree.add(new Cell("Software Engineering"));
+        CourseThree.add(new Cell(3));
 
-        //relationalAlgebra.project(mydb.getRelationByName("Courses"), projectedAttributes1).print();
+        mydb.getRelationByName("Courses").insert(CourseThree);
 
-        //relationalAlgebra.union(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
-
-        // TOUCH UP THIS
-        //relationalAlgebra.diff(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
-
-        /* Rename works 
+        relationalAlgebra.diff(mydb.getRelationByName("Courses"), mydb.getRelationByName("Classes")).print();
+        
+        // Rename
+        System.out.println("Change the name of courses to Classes:");
         ArrayList<String> newAttributes = new ArrayList<String>();
-        newAttributes.addAll(Arrays.asList("CourseID", "Course Name", "Total Credits"));
+        newAttributes.addAll(Arrays.asList("ClassID", "Class Name", "Total Credits"));
         mydb.getRelationByName("Courses").print();
         relationalAlgebra.rename(mydb.getRelationByName("Courses"), attributesTwo, newAttributes).print();
-        */
 
+        // Cartesian Product
+        System.out.println("Cartesian Product between Students and Courses:");
+        relationalAlgebra.cartesianProduct(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
 
-        // SHOULD WORK, BUT DOUBLE CHECK
-        //relationalAlgebra.cartesianProduct(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
+        // join
+        System.out.println("Joining all students and the courses they are enrolled in");
+        relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment")).print();
 
-
-        // WORKING THROUGH THETA JOIN
-        //Predicate p2 = new PredicateImpl("StudentID=\"1111\"", mydb.getRelationByName("Students").getAttrs());
-        //relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses"), p2).print();
-
+        // join
+        System.out.println("Theta joining all Professors with the classes they teach:");
+        Predicate join2 = new PredicateImpl(mydb.getRelationByName("Professors"), mydb.getRelationByName("Teaches"), "ProfessorID=ProfessorID");
+        relationalAlgebra.join(mydb.getRelationByName("Professors"), mydb.getRelationByName("Teaches"), join2).print();
 
     }
 }
