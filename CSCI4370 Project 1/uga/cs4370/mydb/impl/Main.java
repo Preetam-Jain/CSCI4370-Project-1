@@ -335,12 +335,12 @@ public class Main {
         relationalAlgebra.project(relationalAlgebra.select(R3, p3), q3Attrs).print();
 
         // Question 4
-        // Relation R4_1 = relationalAlgebra.join(mydb.getRelationByName("Teaches"), mydb.getRelationByName("Professors"));
-        // Relation R4 = relationalAlgebra.join(mydb.getRelationByName("Courses"),R4_1);
-        // Predicate p4 = new PredicateImpl("Credits>2", ((RelationImpl)R4).getAttrs());
-        // List<String> q4Attrs = new ArrayList<String>();
-        // q4Attrs.addAll(Arrays.asList("FName", "LName", "ProfessorID"));
-        // relationalAlgebra.project(relationalAlgebra.select(R4, p4), q4Attrs).print();
+        Relation R4_1 = relationalAlgebra.join(mydb.getRelationByName("Teaches"), mydb.getRelationByName("Professors"));
+        Relation R4 = relationalAlgebra.join(mydb.getRelationByName("Courses"),R4_1);
+        Predicate p4 = new PredicateImpl("Credits>\"2\"", ((RelationImpl)R4).getAttrs());
+        List<String> q4Attrs = new ArrayList<String>();
+        q4Attrs.addAll(Arrays.asList("FName", "LName", "ProfessorID"));
+        relationalAlgebra.project(relationalAlgebra.select(R4, p4), q4Attrs).print();
 
         
         // Question 5
@@ -372,14 +372,17 @@ public class Main {
 
         // Question 8
         List<String> q8Attrs = new ArrayList<String>();
-        q8Attrs.addAll(Arrays.asList("FName", "LName", "ProfessorID"));
-        Relation R8_1 = relationalAlgebra.join(mydb.getRelationByName("Teaches"), mydb.getRelationByName("Professors"));
+        q8Attrs.addAll(Arrays.asList("Professor.ProfessorID", "Professor.FName", "Professor.LName", "Department"));
+        Relation R8_rename = relationalAlgebra.rename(mydb.getRelationByName("Professors"), mydb.getRelationByName("Professors").getAttrs(), q8Attrs);
+        Relation R8_1 = relationalAlgebra.join(mydb.getRelationByName("Teaches"), R8_rename);
         Relation R8_2 = relationalAlgebra.join(mydb.getRelationByName("Courses"), R8_1);
         Relation R8_3 = relationalAlgebra.join(mydb.getRelationByName("Enrollment"), R8_2);
         Relation R8_4 = relationalAlgebra.join(mydb.getRelationByName("Students"), R8_3);
         Predicate p8_1 = new PredicateImpl("Major=\"Computer Science\"", ((RelationImpl)R8_4).getAttrs());
         Relation R8_5 = relationalAlgebra.select(R8_4, p8_1);
-        relationalAlgebra.project(R8_5, q8Attrs).print();
+        List<String> q8Attrs_2 = new ArrayList<String>();
+        q8Attrs_2.addAll(Arrays.asList("Professor.ProfessorID", "Professor.FName", "Professor.LName"));
+        relationalAlgebra.project(R8_5, q8Attrs_2).print();
 
 
 
