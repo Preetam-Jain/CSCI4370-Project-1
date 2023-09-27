@@ -196,7 +196,11 @@ public class RelationImpl implements Relation {
             try {
                 temp = table.get(i).get(index).toString().length();
             } catch (IndexOutOfBoundsException e) {
-                throw new IndexOutOfBoundsException();
+                /*System.out.println("\nAttributes: " + this.attrs);
+                System.out.println("Table: " + this.table);
+                System.out.println("i: " + i);
+                System.out.println("index: " + index);*/
+                throw new IndexOutOfBoundsException(e.getMessage());
             }
             if (max < temp) {
                 max = temp;

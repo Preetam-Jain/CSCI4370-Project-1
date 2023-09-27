@@ -79,14 +79,14 @@ public class Main {
         rowThree.add(new Cell("Introduction to Programming"));
         rowThree.add(new Cell(3));
 
-        mydb.getRelations().get(1).insert(rowThree);
+        mydb.getRelationByName("Courses").insert(rowThree);
 
         List<Cell> rowFour = new ArrayList<Cell>();
         rowFour.add(new Cell(102));
         rowFour.add(new Cell("Database Management"));
         rowFour.add(new Cell(4));
  
-        mydb.getRelations().get(1).insert(rowFour);
+        mydb.getRelationByName("Courses").insert(rowFour);
 
         List<Cell> rowFive = new ArrayList<Cell>();
         rowFive.add(new Cell(103));
@@ -207,7 +207,6 @@ public class Main {
 
         mydb.getRelationByName("Enrollment").insert(EnrollmentOne);
 
-
         List<Cell> EnrollmentTwo = new ArrayList<Cell>();
         EnrollmentTwo.add(new Cell(2));
         EnrollmentTwo.add(new Cell(1234));
@@ -244,10 +243,10 @@ public class Main {
         mydb.getRelationByName("Enrollment").insert(EnrollmentFive);
 
         mydb.getRelationByName("Enrollment").print();
-        mydb.getRelationByName("Teaches").print();
+        mydb.getRelationByName("Courses").print();
 
-        Predicate p3 = new PredicateImpl(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches"), "CourseID=CourseID");
-        relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches"), p3).print();
-        relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches")).print();
+        Predicate p3 = new PredicateImpl(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses"), "CourseID=CourseID");
+        //relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Teaches"), p3).print();
+        relationalAlgebra.join(mydb.getRelationByName("Enrollment"), mydb.getRelationByName("Courses")).print();
     }
 }

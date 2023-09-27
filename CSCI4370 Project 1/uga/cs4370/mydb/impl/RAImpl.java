@@ -72,7 +72,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
             }
         }
         //making new relation
-        Relation newRel = new RelationImpl(rel.getName(), attrs, types);
+        Relation newRel = builder.newRelation(rel.getName(), attrs, types);
         ((RelationImpl)newRel).addForeignKeys(newForeignKeys);
         ((RelationImpl)newRel).addPrimaryKeys(newPrimaryKeys);
 
@@ -114,7 +114,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         List <Type> unionTypes = new ArrayList<>();
         unionTypes.addAll(a1Types);
 
-        Relation newRel = new RelationImpl("Union of " + rel1.getName() + " and "+ rel2.getName(), unionAttrs, unionTypes);
+        Relation newRel = builder.newRelation("Union of " + rel1.getName() + " and "+ rel2.getName(), unionAttrs, unionTypes);
         List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel1).getForeignKeys().values());
         ((RelationImpl)newRel).addForeignKeys(foreignKeys);
         List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel1).getPrimaryKeys().values());
@@ -162,7 +162,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         List <Type> unionTypes = new ArrayList<>();
         unionTypes.addAll(a1Types);
 
-        Relation newRel = new RelationImpl("Difference of " + rel1.getName() + " and " + rel2.getName(),
+        Relation newRel = builder.newRelation("Difference of " + rel1.getName() + " and " + rel2.getName(),
                                              unionAttrs, unionTypes);
         List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel1).getForeignKeys().values());
         ((RelationImpl)newRel).addForeignKeys(foreignKeys);
@@ -210,7 +210,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                 newAttrs.add(rel.getAttrs().get(i));
             }
         }
-        Relation renamed = new RelationImpl(rel.getName(), newAttrs, rel.getTypes());
+        Relation renamed = builder.newRelation(rel.getName(), newAttrs, rel.getTypes());
         List<String> foreignKeys = new ArrayList<String>(((RelationImpl)rel).getForeignKeys().values());
         ((RelationImpl)renamed).addForeignKeys(foreignKeys);
         List<String> primaryKeys = new ArrayList<String>(((RelationImpl)rel).getPrimaryKeys().values());
@@ -252,7 +252,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         combinedTypes.addAll(rel1.getTypes());
         combinedTypes.addAll(rel2.getTypes());
 
-        Relation newRel = new RelationImpl("Cartesian Product of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
+        Relation newRel = builder.newRelation("Cartesian Product of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
         
         //Cartesian product with double for each loop
         List <List<Cell>> table1 = rel1.getRows();
@@ -294,7 +294,9 @@ public class RAImpl implements uga.cs4370.mydb.RA {
             }
             else if (i >= attrs1.size() && !joinedAttrs.contains(attrs2.get(counter))) {
                 joinedAttrs.add(attrs2.get(counter));
-                joinedTypes.add(rel1.getTypes().get(counter));
+                joinedTypes.add(rel2.getTypes().get(counter));
+            }
+            if (i >= attrs1.size()) {
                 counter++;
             }
         }
@@ -309,7 +311,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         }
 
         // New Relation
-        Relation newRel = new RelationImpl("Natural join of " + rel1.getName() + " and " + rel2.getName(), joinedAttrs, joinedTypes );
+        Relation newRel = builder.newRelation("Natural join of " + rel1.getName() + " and " + rel2.getName(), joinedAttrs, joinedTypes );
         
         //Compare common attribute values and combine
         boolean same = true;
@@ -329,8 +331,10 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                         if (i < row1.size()) {
                             commonRow.add(row1.get(i));
                         }
-                        else if (i >= row1.size() && !commonRow.contains(row2.get(start))) {
+                        else if (i >= row1.size() && !rel1.getAttrs().contains(rel2.getAttrs().get(start))) {
                             commonRow.add(row2.get(start));
+                        }
+                        if (i >= row1.size()) {
                             start++;
                         }
                     }
@@ -353,12 +357,14 @@ public class RAImpl implements uga.cs4370.mydb.RA {
             } else if (i >= rel1.getAttrs().size() && !combinedAttrs.contains(rel2.getAttrs().get(counter))) {
                 combinedAttrs.add(rel2.getAttrs().get(counter));
                 combinedTypes.add(rel2.getTypes().get(counter));
-                counter++;
             } else if (combinedAttrs.contains(rel2.getAttrs().get(counter))) {
                 sameIndex = rel1.getAttrs().size() + counter;
             }
+            if (i >= rel1.getAttrs().size()) {
+                counter++;
+            }
         }
-        Relation joinedRel = new RelationImpl("Theta join of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
+        Relation joinedRel = builder.newRelation("Theta join of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
         List<Cell> checkCombined = new ArrayList<Cell>();
         for (List<Cell> row1 : rel1.getRows()) {
             for (List<Cell> row2 : rel2.getRows()) {
@@ -366,7 +372,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                 checkCombined.addAll(row2);
                 if (p.check(checkCombined)) {
                     List<Cell> confirmed = new ArrayList<Cell>();
-                    for (int i = 0; i < combinedAttrs.size(); i++) {
+                    for (int i = 0; i < checkCombined.size(); i++) {
                         if (!(i == sameIndex)) {
                             confirmed.add(checkCombined.get(i));
                         }
