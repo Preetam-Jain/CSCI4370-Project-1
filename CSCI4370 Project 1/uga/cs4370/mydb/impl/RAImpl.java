@@ -3,7 +3,6 @@ package uga.cs4370.mydb.impl;
 import java.util.ArrayList;
 import java.util.List;
 import uga.cs4370.mydb.*;
-import uga.cs4370.mydb.Relation;
 
 public class RAImpl implements uga.cs4370.mydb.RA {
     // add support for foreign and primary keys to be saved when you select and project
