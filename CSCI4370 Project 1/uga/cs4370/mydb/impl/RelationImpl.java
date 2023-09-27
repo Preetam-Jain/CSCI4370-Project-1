@@ -147,7 +147,7 @@ public class RelationImpl implements Relation {
 
     public boolean containsDuplicatePrimaryKey(Cell cell, int index) {
         for (int i = 0; i < table.size(); i++) {
-            if (table.get(index).get(i).equals(cell)) {
+            if (table.get(i).get(index).equals(cell)) {
                 return true;
             }
         }
