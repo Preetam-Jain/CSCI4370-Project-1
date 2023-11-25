@@ -160,49 +160,37 @@ public class RelationImpl implements Relation {
         System.out.print("| ");
         for (int i = 0; i < attrs.size(); i++) {
             System.out.print(attrs.get(i));
-            int len = findLengthDifference(i) - attrs.get(i).length();
-            if (len > 0) {
-                for (int j = 0; j < len; j++) {
-                    System.out.print(" ");
-                }
+            int len = Math.max(findLengthDifference(i), attrs.get(i).length()) - attrs.get(i).length();
+            for (int j = 0; j < len; j++) {
+                System.out.print(" ");
             }
             System.out.print(" | ");
         }
         System.out.println();
+
         for (int i = 0; i < table.size(); i++) {
             System.out.print("| ");
             for (int j = 0; j < table.get(0).size(); j++) {
-                System.out.print(table.get(i).get(j));
-                String convert = table.get(i).get(j).toString();
-                int len = findLengthDifference(j) - convert.length();
-                if (len < attrs.get(j).length()) {
-                    len = attrs.get(j).length() - convert.length();
-                }
-                if (len > 0) {
-                    for (int k = 0; k < len; k++) {
-                        System.out.print(" ");
-                    }
+                String cell = table.get(i).get(j).toString();
+                System.out.print(cell);
+                int len = Math.max(findLengthDifference(j), attrs.get(j).length()) - cell.length();
+                for (int k = 0; k < len; k++) {
+                    System.out.print(" ");
                 }
                 System.out.print(" | ");
             }
-        System.out.println();
+            System.out.println();
         }
     }
 
     public int findLengthDifference(int index) {
         int max = 0;
-        int temp = 0;
         for (int i = 0; i < table.size(); i++) {
-            try {
-                temp = table.get(i).get(index).toString().length();
-            } catch (IndexOutOfBoundsException e) {
-                throw new IndexOutOfBoundsException();
-            }
+            int temp = table.get(i).get(index).toString().length();
             if (max < temp) {
                 max = temp;
             }
         }
         return max;
     }
-    
 }
