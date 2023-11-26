@@ -4,9 +4,8 @@
 
 ## Compiling commands
 In order to compile all of the required java files, make sure that you are in the parent directory of bin and uga (It should be CSCI4370 Project 1 for example).
- - Once in the main project directory, enter the following commands:
-    javac -cp bin -d bin .\uga\cs4370\mydb\*.java
-    javac -cp bin -d bin .\uga\cs4370\mydb\impl\*.java
+ - Once in the main project directory, enter the following command:
+    javac -d bin .\uga\cs4370\mydb\impl\*.java
 
 ## Running command
 In order to run our Project 3, make sure that you are in the main project directory (this should be the parent directory of bin and uga)
