@@ -16,6 +16,8 @@ In order to run our Project 3, make sure that you are in the main project direct
 ## Project Explanation 
 Our project implements indexing on tables with periodic rehashing using the polynomial rolling hash function.
 Each hash table tracks the average chain length, and if it reaches or exceeds .75, then the hash table rehashes.
+If you wish to see the joined tables or the tables used in the joins, simply add .print() to the joined tables or
+use the getRelationByName method and add .print() to see the tables used.
 
 ### Insertion:
 To store values in the hash table, the Relation will insert a cell into the hashtable.
