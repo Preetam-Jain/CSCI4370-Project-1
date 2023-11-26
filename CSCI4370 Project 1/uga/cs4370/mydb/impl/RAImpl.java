@@ -3,7 +3,6 @@ package uga.cs4370.mydb.impl;
 import java.util.ArrayList;
 import java.util.List;
 import uga.cs4370.mydb.*;
-import uga.cs4370.mydb.Relation;
 
 public class RAImpl implements uga.cs4370.mydb.RA {
     // add support for foreign and primary keys to be saved when you select and project
@@ -337,19 +336,50 @@ public class RAImpl implements uga.cs4370.mydb.RA {
         // New Relation
         Relation newRel = builder.newRelation("Natural join of " + rel1.getName() + " and " + rel2.getName(), joinedAttrs, joinedTypes );
         
-        //Compare common attribute values and combine
-        boolean same = true;
-        for (List <Cell> row1 : table1) {
-            for (List <Cell> row2 : table2) {
+        // get all attributes for which there is an index
+        List<String> hasIndex = new ArrayList<>();
+        for (String attribute : indices) {
+            HashTable index = rel2.getIndex(attribute);
+            if (index != null) {
+                hasIndex.add(attribute);
+            }
+        }
+        indices.removeAll(hasIndex); // remove the attributes for which there are indices, as do not need regular comparison for those
+
+        for (List<Cell> row1 : table1) { // iterating through every row in the first table
+            List<List<Cell>> vetted = new ArrayList<List<Cell>>(); // rows which pass the comparsion on attributes that are indexed
+            boolean same = true;
+            
+            List<Integer> rowIndices = new ArrayList<>(); // indices to rows that pass
+
+            for (String attribute : hasIndex) {
+                HashTable index = rel2.getIndex(attribute);
+                rowIndices = index.search(row1.get(rel1.getAttrIndex(attribute)).toString()); // getting the indices for all rows
+
+                if (rowIndices.isEmpty()) { // there is no existing row that has a corresponding value in table 1
+                    same = false;
+                    break;
+                } 
+            }
+
+            if (hasIndex.isEmpty()) { // if there were no indices, have to compare the entire table
+                vetted = table2;
+            } else if (!rowIndices.isEmpty() && same == true) { 
+                for (Integer i : rowIndices) {
+                    vetted.add(table2.get(i));
+                } // adding all the rows from table 2 using the indices previous gathered from searching the index
+            } 
+            for (List <Cell> row2 : vetted) {
                 same = true;
-                for (String attribute : indices) {
+                for (String attribute : indices) { // need to check any unindexed attributes
                     if (!(row1.get(rel1.getAttrIndex(attribute)).toString().equals(row2.get(rel2.getAttrIndex(attribute)).toString()))) {
                         same = false;
                     } 
                 }
-                if (same) {
+
+                if (same) { 
                     //Found the row2 that matches with row1 with common attributes
-                    List <Cell> commonRow = new ArrayList<>();
+                    List <Cell> commonRow = new ArrayList<>(); // creating the row to be added
                     int start = 0;
                     for (int i = 0; i < row1.size() + row2.size(); i++) {
                         if (i < row1.size()) {
@@ -364,9 +394,9 @@ public class RAImpl implements uga.cs4370.mydb.RA {
                     }
                     newRel.insert(commonRow);
                 }
-            }
+            } 
         }
-        return newRel;
+        return newRel; // joined relation
     }
 
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
@@ -389,6 +419,7 @@ public class RAImpl implements uga.cs4370.mydb.RA {
             }
         }
         Relation joinedRel = builder.newRelation("Theta join of " + rel1.getName() + " and " + rel2.getName(), combinedAttrs, combinedTypes);
+        //if (rel2.getIndex(null)
         List<Cell> checkCombined = new ArrayList<Cell>();
         for (List<Cell> row1 : rel1.getRows()) {
             for (List<Cell> row2 : rel2.getRows()) {

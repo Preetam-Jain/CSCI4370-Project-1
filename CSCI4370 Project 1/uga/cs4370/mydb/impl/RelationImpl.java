@@ -2,6 +2,7 @@ package uga.cs4370.mydb.impl;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -15,6 +16,7 @@ public class RelationImpl implements Relation {
     private int size = 0; // ammount of rows in the table
     private List<List<Cell>> table; // contains the structure for the table 
     private List<String> attrs; // the names of the attributes of the table
+    private List<HashTable> indices = new ArrayList<HashTable>();
     private List<Type> types; // the names of the types of each column
     private HashSet<String> unique;
     private HashMap<Integer, String> primaryKeys = new HashMap<>(); // stores the indexes of the primary keys in a hashmap,
@@ -75,6 +77,17 @@ public class RelationImpl implements Relation {
             return this.attrs.indexOf(attr);
         }
         throw new IllegalArgumentException("Does not contain the specified attribute");
+    }
+
+    public HashTable getIndex(String attr) {
+        for (HashTable index : this.indices) {
+            if (index.getAttr().equals(attr)) return index;
+        }
+        return null;
+    }
+
+    public void removeIndex(String attr) {
+        this.indices.remove(this.getIndex(attr));
     }
 
     public Type getType(Cell cell) {
@@ -152,6 +165,53 @@ public class RelationImpl implements Relation {
             }
         }
         return false;
+    }
+
+    public void index(String attr) {
+        if (!(this.attrs.contains(attr))) throw new IllegalArgumentException();
+
+        HashTable index = new HashTable(attr);
+        indices.add(index); // adding to all other indices that exist for the table
+
+        int attrIndex = this.getAttrIndex(attr);
+        String value; 
+        int rowIndex = 0;
+        for (List<Cell> row : this.table) {
+            // converting cell value to string for hashing
+            try {
+                 value = row.get(attrIndex).getAsString().toString();
+            } catch (RuntimeException e) {
+                try {
+                    value = Double.toString(row.get(attrIndex).getAsDouble());
+                } catch (RuntimeException d) {
+                    value = Integer.toString(row.get(attrIndex).getAsInt());
+                }
+            }
+            long hash = hash(value);
+            index.insert(hash, rowIndex); // creating the element with its row index for easy lookup
+            rowIndex++;
+        }
+    }
+
+    public static Long hash(String key) {
+        long hash = 0;
+        int prime = 31;
+        long modulus = 1000000007;
+        long length = key.length();
+        long pow = 1;
+        // creates hash using polynomial rolling hash function on the stringified value
+        for (int i = 0; i < length; i++) {
+            char c = key.charAt(i);
+            long charValue = c;
+            hash = (hash + charValue * pow) % modulus;
+            pow = (pow * prime) % modulus;
+        }
+
+        if (hash < 0) {
+            hash += modulus;
+        }
+
+        return hash;
     }
 
     @Override

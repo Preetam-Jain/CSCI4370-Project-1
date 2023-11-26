@@ -1,6 +1,7 @@
 package uga.cs4370.mydb;
 
 import java.util.List;
+import uga.cs4370.mydb.impl.HashTable;
 
 /**
  * Represents a relation instance.
@@ -48,6 +49,16 @@ public interface Relation {
     public int getAttrIndex(String attr);
 
     /**
+     * Returns the index of the specified attribute, if not existant then it returns null.
+     */ 
+    public HashTable getIndex(String attr);
+
+    /**
+     * Removes the index of the specified attribute.
+     */ 
+    public void removeIndex(String attr);
+
+    /**
      * Inserts a row in the relation.
      * 
      * @throws IllegalArgumentException if the cell types do not correspond 
@@ -62,6 +73,14 @@ public interface Relation {
      * to the attibute types of the relation or if the row already exists.
      */
     public void insert(List<Cell> cells);
+
+    /**
+     * Creates an index on an attribute
+     * 
+     * @throws IllegalArgumentException if attribute within the table does not
+     * exist
+     */
+    public void index(String attr);
 
     /**
      * Print the relation properly formatted as a table 

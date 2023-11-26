@@ -1,8 +1,11 @@
 package uga.cs4370.mydb.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import uga.cs4370.mydb.Cell;
 import uga.cs4370.mydb.Type;
@@ -531,14 +534,163 @@ public class Main {
         System.out.println("Cartesian Product between Students and Courses:");
         relationalAlgebra.cartesianProduct(mydb.getRelationByName("Students"), mydb.getRelationByName("Courses")).print();
 
-        // join
-        System.out.println("Joining all students and the courses they are enrolled in");
-        relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment")).print();
 
         // join
         System.out.println("Theta joining all Professors with the classes they teach:");
         Predicate join2 = new PredicateImpl(mydb.getRelationByName("Professors"), mydb.getRelationByName("Teaches"), "ProfessorID=ProfessorID");
         relationalAlgebra.join(mydb.getRelationByName("Professors"), mydb.getRelationByName("Teaches"), join2).print();
 
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        // basic natural loop join
+        //System.out.println("Joining all students and the courses they are enrolled in");
+        System.out.println("Testing non-indexed vs indexed tables with 10 join operations\n");
+        System.out.println("Testing small table performance (5 rows)");
+        System.out.println("--------------------------------------------");
+        System.out.println("Running short basic natural loop join");
+        long shortNonIndexedStarts[] = new long[10];
+        long shortNonIndexedEnds[] = new long[10];
+
+        for (int i = 0; i < 10; i++) {
+            shortNonIndexedStarts[i] = System.nanoTime();
+            relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment"));
+            shortNonIndexedEnds[i] = System.nanoTime();
+        }
+
+        // indexed natural loop join
+        System.out.println("Running short indexed natural loop join\n");
+        long shortIndexedStarts[] = new long[10];
+        long shortIndexedEnds[] = new long[10];
+
+        mydb.getRelationByName("Enrollment").index("StudentID");
+        for (int i = 0; i < 10; i++) {
+            shortIndexedStarts[i] = System.nanoTime();
+            relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment"));
+            shortIndexedEnds[i] = System.nanoTime();
+        }
+
+        for (int i = 1000; i < 2000; i++) {
+            if (i != 1234 && i != 1111 && i != 2222 && i != 3333 && i != 4444) { 
+                createRow(mydb, "Students", i, "Bob", "Ross", "2002-04-09", "Art");
+            }
+        }
+
+        Random rand = new Random();
+        for (int i = 150; i < 400; i++) {
+            createRow(mydb, "Enrollment", i, 1000 + rand.nextInt(1001), 101, "A");
+        }
+
+        try {
+            System.out.println("Testing large table performance in 5 seconds.");
+            TimeUnit.SECONDS.sleep(5);
+        } catch(Exception e) {}
+
+        System.out.println("\nTesting large table performance (1000 rows)");
+        System.out.println("--------------------------------------------");
+        long longNonIndexedStarts[] = new long[10];
+        long longNonIndexedEnds[] = new long[10];
+
+        mydb.getRelationByName("Enrollment").removeIndex("StudentID");
+
+        System.out.println("Running long basic natural loop join");
+        for (int i = 0; i < 10; i++) {
+            longNonIndexedStarts[i] = System.nanoTime();
+            relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment"));
+            longNonIndexedEnds[i] = System.nanoTime();
+        }
+
+        mydb.getRelationByName("Enrollment").index("StudentID");
+        long longIndexedStarts[] = new long[10];
+        long longIndexedEnds[] = new long[10];
+
+        System.out.println("Running long indexed natural loop join\n");
+        for (int i = 0; i < 10; i++) {
+            longIndexedStarts[i] = System.nanoTime();
+            relationalAlgebra.join(mydb.getRelationByName("Students"), mydb.getRelationByName("Enrollment"));
+            longIndexedEnds[i] = System.nanoTime();
+        }
+        
+        double minShortNonIndexed = Double.MAX_VALUE;
+        double maxShortNonIndexed = 0;
+        double averageShortNonIndexed = 0;
+
+        double minShortIndexed = Double.MAX_VALUE;
+        double maxShortIndexed = 0;
+        double averageShortIndexed = 0;
+
+        double minLongNonIndexed = Double.MAX_VALUE;
+        double maxLongNonIndexed = 0;
+        double averageLongNonIndexed = 0;
+
+        double minLongIndexed = Double.MAX_VALUE;
+        double maxLongIndexed = 0;
+        double averageLongIndexed = 0;
+
+        for (int i = 0; i < 10; i++) {
+            long shortNonIndexed = shortNonIndexedEnds[i] - shortNonIndexedStarts[i];
+            minShortNonIndexed = Math.min(minShortNonIndexed, shortNonIndexed); 
+            maxShortNonIndexed = Math.max(maxShortNonIndexed, shortNonIndexed); 
+            averageShortNonIndexed += shortNonIndexed;
+
+            long shortIndexed = shortIndexedEnds[i] - shortIndexedStarts[i];
+            minShortIndexed = Math.min(minShortIndexed, shortIndexed); 
+            maxShortIndexed = Math.max(maxShortIndexed, shortIndexed); 
+            averageShortIndexed += shortIndexed;
+
+            long longNonIndexed = longNonIndexedEnds[i] - longNonIndexedStarts[i];
+            minLongNonIndexed = Math.min(minLongNonIndexed, longNonIndexed); 
+            maxLongNonIndexed = Math.max(maxLongNonIndexed, longNonIndexed); 
+            averageLongNonIndexed += longNonIndexed;
+
+            long longIndexed = longIndexedEnds[i] - longIndexedStarts[i];
+            minLongIndexed = Math.min(minLongIndexed, longIndexed); 
+            maxLongIndexed = Math.max(maxLongIndexed, longIndexed); 
+            averageLongIndexed += longIndexed;
+        }
+
+        System.out.println("Performance Report");
+        System.out.println("--------------------------------------------\n");
+
+        System.out.println("Short Non-Indexed Join");
+        System.out.println("--------------------------------------------");
+        System.out.printf("Minimum Time: %.2E ns\n", (double) minShortNonIndexed);
+        System.out.printf("Maximum Time: %.2E ns\n", (double) maxShortNonIndexed);
+        System.out.printf("Average Time: %.2E ns\n", (double) averageShortNonIndexed / 10.0);
+        System.out.println();
+        
+        System.out.println("Short Indexed Join");
+        System.out.println("--------------------------------------------");
+        System.out.printf("Minimum Time: %.2E ns\n", (double) minShortIndexed);
+        System.out.printf("Maximum Time: %.2E ns\n", (double) maxShortIndexed);
+        System.out.printf("Average Time: %.2E ns\n", (double) averageShortIndexed / 10.0);
+        System.out.println();
+        
+        System.out.println("Long Non-Indexed Join");
+        System.out.println("--------------------------------------------");
+        System.out.printf("Minimum Time: %.2E ns\n", (double) minLongNonIndexed);
+        System.out.printf("Maximum Time: %.2E ns\n", (double) maxLongNonIndexed);
+        System.out.printf("Average Time: %.2E ns\n", (double) averageLongNonIndexed / 10.0);
+        System.out.println();
+        
+        System.out.println("Long Indexed Join");
+        System.out.println("--------------------------------------------");
+        System.out.printf("Minimum Time: %.2E ns\n", (double) minLongIndexed);
+        System.out.printf("Maximum Time: %.2E ns\n", (double) maxLongIndexed);
+        System.out.printf("Average Time: %.2E ns\n", (double) averageLongIndexed / 10.0);
+        
+    }
+
+    private static void createRow(Database database, String tableName, Object... values) {
+        Relation table = database.getRelationByName(tableName);
+        List<Cell> row = new ArrayList<>();
+        for (Object value : values) {
+            if (value instanceof String) {
+                row.add(new Cell((String)value));
+            } else if (value instanceof Integer) {
+                row.add(new Cell((int)value));
+            } else if (value instanceof Double) {
+                row.add(new Cell((double)value));
+            }
+        }
+        table.insert(row);
     }
 }
